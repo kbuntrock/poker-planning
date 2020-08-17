@@ -1,2 +1,2 @@
-# pocker-planning
-Simple website to host a distant poker planning ith your coworkers
+# poker-planning
+Simple website to host a distant poker planning with your coworkers
