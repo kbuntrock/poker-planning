@@ -1,6 +1,7 @@
 <app-header></app-header>
 <div class="app-body">
-  <app-login></app-login>
+  <app-login *ngIf="!hasUsername"></app-login>
+  <div *ngIf="hasUsername">Welcome {{username}}</div>
 </div>
 
 

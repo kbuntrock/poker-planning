@@ -1,3 +1,10 @@
 <mat-toolbar color="primary">
     <span>Poker Planning</span>
+    <span class="spacer"></span>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+        <button (click)="deconnecter()" mat-menu-item>Déconnexion</button>
+    </mat-menu>
 </mat-toolbar>

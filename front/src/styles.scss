@@ -41,3 +41,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .full-width {
   width: 100%;
 }
+
+.small-card-size {
+  max-width: 800px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

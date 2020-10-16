@@ -6,11 +6,11 @@
         ou tout ce qui permettra à votre équipe de vous identifier.
     </mat-card-subtitle>
     <mat-card-content>
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
+        <form>
             <mat-form-field appearance="outline" class="full-width">
-              <input formControlName="username" matInput placeholder="Votre nom">
+              <input matInput placeholder="Votre nom">
             </mat-form-field>
-            <button mat-raised-button type="submit" color="accent">Valider</button>
+            <button mat-raised-button color="accent">Valider</button>
         </form>
           
       </mat-card-content>
