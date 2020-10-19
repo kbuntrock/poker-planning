@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PropertiesService } from '../properties.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private readonly appProperties: PropertiesService,  private formBuilder: FormBuilder) {
     this.loginForm = this.formBuilder.group({
-      username: ''
+      username: ['', [Validators.required, Validators.maxLength(15)]]
     });
    }
 
@@ -21,6 +21,8 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(value: any) {
-    this.appProperties.setUsername(value.username);
+    if(this.loginForm.valid) {
+      this.appProperties.setUsername(value.username);
+    }
   }
 }
