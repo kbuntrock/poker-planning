@@ -1,5 +1,6 @@
-package fr.bks.pokerPlanning;
+package fr.bks.pokerPlanning.websocket;
 
+import fr.bks.pokerPlanning.websocket.CustomHandshakeHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -20,7 +21,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry
 				.addEndpoint("/websocket")
+				.setHandshakeHandler(new CustomHandshakeHandler())
 				.withSockJS()
+				//.setWebSocketEnabled(false)
 				;
 	}
 
