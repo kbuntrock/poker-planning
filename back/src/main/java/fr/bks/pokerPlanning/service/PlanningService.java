@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -108,8 +109,14 @@ public class PlanningService {
             output.setConnectedUsers(session.getConnectedUsers());
             output.setStoryLabel(session.getStoryLabel());
         }
-        output.setVotes(session.getVotes());
+
+        if (session.isVoteInProgress()) {
+            output.setVoted(session.getVotes().keySet());
+        } else {
+            output.setVotes(session.getVotes());
+        }
 
         messagingTemplate.convertAndSend("/topic/planning/" + session.getPlanningUuid().toString(), output);
     }
+
 }

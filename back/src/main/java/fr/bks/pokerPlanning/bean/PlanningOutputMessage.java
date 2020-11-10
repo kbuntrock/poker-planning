@@ -2,9 +2,9 @@ package fr.bks.pokerPlanning.bean;
 
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class PlanningOutputMessage {
 
@@ -13,6 +13,8 @@ public class PlanningOutputMessage {
     private List<WebSocketPrincipal> connectedUsers;
 
     private String storyLabel;
+
+    private Set<String> voted;
 
     private Map<String, Integer> votes;
 
@@ -38,6 +40,14 @@ public class PlanningOutputMessage {
 
     public void setStoryLabel(String storyLabel) {
         this.storyLabel = storyLabel;
+    }
+
+    public Set<String> getVoted() {
+        return voted;
+    }
+
+    public void setVoted(Set<String> voted) {
+        this.voted = voted;
     }
 
     public Map<String, Integer> getVotes() {
