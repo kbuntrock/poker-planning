@@ -8,33 +8,43 @@ import java.util.Map;
 
 public class PlanningOutputMessage {
 
-	private String type;
+    private String type;
 
-	private List<WebSocketPrincipal> connectedUsers;
+    private List<WebSocketPrincipal> connectedUsers;
 
-	private Map<String, Integer> votes;
+    private String storyLabel;
 
-	public String getType() {
-		return type;
-	}
+    private Map<String, Integer> votes;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public List<WebSocketPrincipal> getConnectedUsers() {
-		return connectedUsers;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setConnectedUsers(List<WebSocketPrincipal> connectedUsers) {
-		this.connectedUsers = connectedUsers;
-	}
+    public List<WebSocketPrincipal> getConnectedUsers() {
+        return connectedUsers;
+    }
 
-	public Map<String, Integer> getVotes() {
-		return votes;
-	}
+    public void setConnectedUsers(List<WebSocketPrincipal> connectedUsers) {
+        this.connectedUsers = connectedUsers;
+    }
 
-	public void setVotes(Map<String, Integer> votes) {
-		this.votes = votes;
-	}
+    public String getStoryLabel() {
+        return storyLabel;
+    }
+
+    public void setStoryLabel(String storyLabel) {
+        this.storyLabel = storyLabel;
+    }
+
+    public Map<String, Integer> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Map<String, Integer> votes) {
+        this.votes = votes;
+    }
 }

@@ -1,15 +1,16 @@
 package fr.bks.pokerPlanning.controller;
 
-import fr.bks.pokerPlanning.bean.PlannerSession;
-import fr.bks.pokerPlanning.bean.PlanningOutputMessage;
 import fr.bks.pokerPlanning.bean.PlanningRegisterMessage;
+import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.bean.PlanningVoteMessage;
-import fr.bks.pokerPlanning.core.PlannerSessionsHolder;
+import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,52 +20,44 @@ import java.util.UUID;
 public class PlanningController {
 
     @Autowired
-    private SimpMessageSendingOperations messagingTemplate;
+    private PlanningService planningService;
 
-    @Autowired
-    private PlannerSessionsHolder plannerSessionsHolder;
+    @MessageExceptionHandler
+    @SendToUser("/topic/error")
+    public String handleException(Exception ex) {
+        return ex.getMessage();
+    }
 
     @GetMapping("/planning/create")
-    public PlannerSession createPlanning() {
-        return plannerSessionsHolder.createSession();
+    public PlanningSession createPlanning() {
+        return planningService.createSession();
     }
 
-    private void sendToPlanning(UUID planningUuid, PlanningOutputMessage output) {
-        messagingTemplate.convertAndSend("/topic/planning/" + planningUuid.toString(), output);
-    }
 
     @MessageMapping("/planning/{planningUuid}/register")
     public void register(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, PlanningRegisterMessage inputMessage) {
-        // todo vérifier pas déjà enregistré
-        principal.setDisplayName(inputMessage.getName());
-
-        PlannerSession session = plannerSessionsHolder.getSession(planningUuid);
-        PlanningOutputMessage output = session.register(principal);
-
-        sendToPlanning(planningUuid, output);
+        planningService.register(planningUuid, principal, inputMessage.getName());
     }
 
     // todo changer de nom, on repasse par register ou méthode dédiée ?
 
     @MessageMapping("/planning/{planningUuid}/vote")
     public void vote(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, PlanningVoteMessage inputMessage) {
-        PlannerSession session = plannerSessionsHolder.getSession(planningUuid);
-
-        PlanningOutputMessage output = session.vote(principal.getName(), inputMessage.getValue());
-
-        sendToPlanning(planningUuid, output);
+        planningService.vote(planningUuid, principal, inputMessage.getValue());
     }
 
     // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/newStory")
+    // public void newStory(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal, String label) {
     @MessageMapping("/planning/{planningUuid}/newStory")
     public void newStory(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, String label) {
-
+        planningService.newStory(planningUuid, label);
     }
 
     // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/reveal")
+    // public void reveal(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal) {
     @MessageMapping("/planning/{planningUuid}/reveal")
     public void reveal(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal) {
-
+        planningService.reveal(planningUuid);
     }
 
 

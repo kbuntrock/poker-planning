@@ -19,13 +19,10 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/planning/42', function (greeting) {
-            showGreeting(JSON.parse(greeting.body).content);
+
+        stompClient.subscribe('/user/topic/error', function (errorText) {
+            showText("<b style='color:red'> Error : " + errorText.body + "</b>");
         });
-        stompClient.subscribe('/user/topic/planning/42', function (greeting) {
-            showGreeting("<i>" + JSON.parse(greeting.body).content + "</i>");
-        });
-       // stompClient.send("/app/planning/42", {}, JSON.stringify({'name': 'test'}));
     }, function (error) {
         console.log('Hum... problème... ' + error);
     });
@@ -39,12 +36,30 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/planning/42", {}, JSON.stringify({'name': $("#name").val()}));
+function enterSession() {
+    stompClient.subscribe('/topic/planning/' + $("#sesId").val(), function (msg) {
+            showText(JSON.parse(msg.body));
+     });
 }
 
-function showGreeting(message) {
-    $("#greetings").append("<tr><td>" + message + "</td></tr>");
+function register() {
+    stompClient.send("/app/planning/" + $("#sesId").val() + "/register", {}, JSON.stringify({'name': $("#name").val()}));
+}
+
+function newStory() {
+    stompClient.send("/app/planning/" + $("#sesId").val() + "/newStory", {}, $("#storyName").val());
+}
+
+function vote() {
+    stompClient.send("/app/planning/" + $("#sesId").val() + "/vote", {}, JSON.stringify({'value': $("#votePoint").val()}));
+}
+
+function reveal() {
+    stompClient.send("/app/planning/" + $("#sesId").val() + "/reveal", {});
+}
+
+function showText(message) {
+    $("#greetings").append("<tr><td>" + JSON.stringify(message) + "</td></tr>");
 }
 
 $(function () {
@@ -53,6 +68,10 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#enterSession" ).click(function() { enterSession(); });
+    $( "#register" ).click(function() { register(); });
+    $( "#newStory" ).click(function() { newStory(); });
+    $( "#vote" ).click(function() { vote(); });
+    $( "#reveal" ).click(function() { reveal(); });
 });
 
