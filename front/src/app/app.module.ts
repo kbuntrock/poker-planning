@@ -17,6 +17,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { JoinRoomComponent } from './room/join-room/join-room.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,8 @@ import { MatMenuModule } from '@angular/material/menu';
     HeaderComponent,
     LoginComponent,
     RoomComponent,
-    CreateRoomComponent
+    CreateRoomComponent,
+    JoinRoomComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +41,8 @@ import { MatMenuModule } from '@angular/material/menu';
     FormsModule,
     ReactiveFormsModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    HttpClientModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]

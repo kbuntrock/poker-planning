@@ -22,6 +22,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		registry
 				.addEndpoint("/websocket")
 				.setHandshakeHandler(new CustomHandshakeHandler())
+				.setAllowedOrigins("http://localhost:4200") // Autorisation des CORS pour le devmode
 				.withSockJS()
 				//.setWebSocketEnabled(false)
 				;

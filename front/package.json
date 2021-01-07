@@ -21,8 +21,12 @@
     "@angular/platform-browser": "~10.0.9",
     "@angular/platform-browser-dynamic": "~10.0.9",
     "@angular/router": "~10.0.9",
+    "@stomp/stompjs": "^6.0.0",
+    "@types/sockjs-client": "^1.5.0",
+    "@types/stompjs": "^2.3.4",
     "ngx-cookie-service": "^10.1.1",
     "rxjs": "~6.5.5",
+    "sockjs-client": "^1.5.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"
   },

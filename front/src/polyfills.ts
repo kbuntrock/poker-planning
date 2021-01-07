@@ -57,6 +57,13 @@
  */
 import 'zone.js/dist/zone';  // Included with Angular CLI.
 
+/**
+* To fix “global is not defined” with SockJS :
+* https://stomp-js.github.io/guide/stompjs/rx-stomp/ng2-stompjs/using-stomp-with-sockjs.html
+**/
+(window as any).global = window;
+
+
 
 /***************************************************************************************************
  * APPLICATION IMPORTS

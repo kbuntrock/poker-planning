@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PropertiesService } from '../properties.service';
 import { Subscription } from 'rxjs';
+import { WebsocketService } from '../../../shared/websocket.service';
 
 @Component({
   selector: 'app-header',
@@ -12,7 +13,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
   public showMenu = false;
 
-  constructor(private readonly propertiesService: PropertiesService) { }
+  constructor(private readonly propertiesService: PropertiesService, private wsService: WebsocketService) { }
 
   ngOnInit(): void {
     this.subscriptions.add(this.propertiesService.getUsername$().subscribe(username => {
@@ -25,7 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   public deconnecter(): void {
-    console.info("deconnecter");
+    this.wsService.disconnect();
     this.propertiesService.eraseUsername();
   }
 

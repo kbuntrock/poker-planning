@@ -1,0 +1,27 @@
+<mat-card class="child">
+    <mat-card-title>
+        Créez un sprint planning
+    </mat-card-title>
+    <mat-card-content>
+        <form (ngSubmit)="createRoom()">
+            <button mat-raised-button color="accent">Créer</button>
+        </form>
+          
+      </mat-card-content>
+</mat-card>
+<h1>OU</h1>
+<mat-card  class="child">
+    <mat-card-title>
+        Rejoindre un sprint planning
+    </mat-card-title>
+    <mat-card-content>
+        <form>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput placeholder="Identifiant">
+            </mat-form-field>
+            <button mat-raised-button color="accent">Rejoindre</button>
+        </form>
+          
+      </mat-card-content>
+</mat-card>
+
