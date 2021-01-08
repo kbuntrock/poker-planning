@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PropertiesService } from '../properties.service';
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '../../../shared/websocket.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +14,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
   public showMenu = false;
 
-  constructor(private readonly propertiesService: PropertiesService, private wsService: WebsocketService) { }
+  constructor(private readonly propertiesService: PropertiesService, 
+    private readonly wsService: WebsocketService,
+    private readonly router: Router) { }
 
   ngOnInit(): void {
     this.subscriptions.add(this.propertiesService.getUsername$().subscribe(username => {
@@ -28,6 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public deconnecter(): void {
     this.wsService.disconnect();
     this.propertiesService.eraseUsername();
+    this.router.navigate(['login']);
   }
 
 }

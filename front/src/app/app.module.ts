@@ -12,13 +12,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { LoginComponent } from './common/login/login.component';
 import { RoomComponent } from './room/room.component';
-import { CreateRoomComponent } from './room/create-room/create-room.component';
 import { CookieService } from 'ngx-cookie-service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { JoinRoomComponent } from './room/join-room/join-room.component';
 import { HttpClientModule } from '@angular/common/http';
+import { PageNotFoundComponent } from './common/page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -26,8 +26,8 @@ import { HttpClientModule } from '@angular/common/http';
     HeaderComponent,
     LoginComponent,
     RoomComponent,
-    CreateRoomComponent,
-    JoinRoomComponent
+    JoinRoomComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
