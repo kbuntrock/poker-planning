@@ -8,6 +8,17 @@ export enum SocketClientState {
   ATTEMPTING_CONNECTION, CONNECTED, ATTEMPTING_DISCONNECTION, DISCONNECTED
 }
 
+export interface User {
+  name: string,
+  displayName: string
+}
+
+export interface WSMessage {
+  type: string,
+  connectedUsers: Array<User>,
+  storyLabel: string
+}
+
 @Injectable({
   providedIn: 'root'
 })

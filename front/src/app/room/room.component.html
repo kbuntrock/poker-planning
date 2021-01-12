@@ -1,4 +1,15 @@
-<div>
-    <h1>Sprint Planning</h1>
-    <h3>id :  {{ roomId }}</h3>
+<div class="team-panel">
+    <h1 class="margin-header tc">Equipe</h1>
+    <mat-list>
+        <mat-list-item class="user" *ngFor="let user of users">
+            <mat-icon class="user-icon">account_circle</mat-icon>
+            {{ user.displayName }}</mat-list-item>
+    </mat-list>
+</div>
+<div class="main-panel">
+    <div class="title">
+        <h1 class="margin-header tc">Sprint Planning S14</h1>
+        <div class="direct-link"><button (click)="copyToClipboard()" mat-raised-button color="accent">Copy direct link</button></div>
+    </div>
+    <h3 class="tc">id :  {{ roomId }}</h3>
 </div>

@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SocketClientState, WebsocketService } from '../../shared/websocket.service';
+import { SocketClientState, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
+import { Clipboard } from '@angular/cdk/clipboard';
+
 
 @Component({
   selector: 'app-room',
@@ -12,9 +14,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   roomId: string;
 
+  users: Array<User>;
+
   subscription: Subscription = new Subscription();
 
-  constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService) { }
+  constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService, private clipboard: Clipboard) { }
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
@@ -38,9 +42,13 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private joinRoom() {
     this.wsService.joinRoom(this.roomId, (message) => {
-      console.info("roomJoinded!");
-      console.info(message);
+      const response: WSMessage = JSON.parse(message.body);
+      this.users = response.connectedUsers;
     });
+  }
+
+  copyToClipboard() {
+    this.clipboard.copy('http://localhost:4200/room/' + this.roomId);
   }
 
 }

@@ -19,6 +19,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { JoinRoomComponent } from './room/join-room/join-room.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PageNotFoundComponent } from './common/page-not-found/page-not-found.component';
+import { ClipboardModule } from '@angular/cdk/clipboard'; 
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,7 @@ import { PageNotFoundComponent } from './common/page-not-found/page-not-found.co
     PageNotFoundComponent
   ],
   imports: [
+    ClipboardModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -42,7 +45,8 @@ import { PageNotFoundComponent } from './common/page-not-found/page-not-found.co
     ReactiveFormsModule,
     MatIconModule,
     MatMenuModule,
-    HttpClientModule
+    HttpClientModule,
+    MatListModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]
