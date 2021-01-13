@@ -19,8 +19,7 @@ export class JoinRoomComponent implements OnInit {
   }
 
   public async createRoom() {
-    const room = await this.http.get<Room>('http://localhost:8080/planning/create').toPromise();
-    console.info("navigate");
+    const room = await this.http.get<Room>('http://localhost:8080/planning/create', { withCredentials: true }).toPromise();
     this.router.navigate(['room/'+room.planningUuid], { relativeTo: this.route.parent });
   }
 

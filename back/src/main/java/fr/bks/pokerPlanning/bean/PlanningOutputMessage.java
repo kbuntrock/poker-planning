@@ -10,6 +10,8 @@ public class PlanningOutputMessage {
 
     private String type;
 
+    private WebSocketPrincipal creator;
+
     private List<WebSocketPrincipal> connectedUsers;
 
     private String storyLabel;
@@ -56,5 +58,13 @@ public class PlanningOutputMessage {
 
     public void setVotes(Map<String, Integer> votes) {
         this.votes = votes;
+    }
+
+    public WebSocketPrincipal getCreator() {
+        return creator;
+    }
+
+    public void setCreator(WebSocketPrincipal creator) {
+        this.creator = creator;
     }
 }

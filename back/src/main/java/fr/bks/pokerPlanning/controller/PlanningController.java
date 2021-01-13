@@ -11,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +30,11 @@ public class PlanningController {
         return ex.getMessage();
     }
 
-    @CrossOrigin(origins = "http://localhost:4200") // Autorise le CORS pour le devmode
+    @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true") // Autorise le CORS pour le devmode
     @GetMapping("/planning/create")
-    public PlanningSession createPlanning() {
-        return planningService.createSession();
+    public PlanningSession createPlanning(@CookieValue(value = "userId", required = true) String userId,
+                                          @CookieValue(value = "username", required = true) String username) {
+        return planningService.createSession(userId, username);
     }
 
 

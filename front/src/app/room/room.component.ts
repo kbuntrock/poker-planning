@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SocketClientState, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { PropertiesService } from '../common/properties.service';
 
 
 @Component({
@@ -14,11 +15,17 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   roomId: string;
 
+  // Indique si l'utilisateur peut proposer des storys
+  isScrumMaster: boolean = false;
+
   users: Array<User>;
+  creator: User;
+  storyLabel: string
 
   subscription: Subscription = new Subscription();
 
-  constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService, private clipboard: Clipboard) { }
+  constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService, 
+    private clipboard: Clipboard, private readonly appProperties: PropertiesService) { }
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
@@ -44,6 +51,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.wsService.joinRoom(this.roomId, (message) => {
       const response: WSMessage = JSON.parse(message.body);
       this.users = response.connectedUsers;
+      this.creator = response.creator;
+      this.isScrumMaster = this.creator.name === this.appProperties.getUserId();
     });
   }
 

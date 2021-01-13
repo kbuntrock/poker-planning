@@ -16,6 +16,7 @@ export interface User {
 export interface WSMessage {
   type: string,
   connectedUsers: Array<User>,
+  creator: User,
   storyLabel: string
 }
 
@@ -92,9 +93,10 @@ export class WebsocketService {
       this.client.subscribe('/topic/planning/'+roomId, callback)
     );
     // et on s'enregistre dessus en tant qu'utilisateur
+    console.info(JSON.stringify({'displayName': this.appProperties.getUsername(), 'name':this.appProperties.getUserId()}));
     this.client.publish({
       destination: '/app/planning/'+roomId+'/register',
-      body: JSON.stringify({'name': this.appProperties.getUsername()})
+      body: JSON.stringify({'displayName': this.appProperties.getUsername(), 'name':this.appProperties.getUserId()})
     });
   }
 }

@@ -15,7 +15,9 @@ public class PlanningSession {
 
     // private final UUID planningAdminKey = UUID.randomUUID();
 
-    private final List<WebSocketPrincipal> connectedUsers = Collections.synchronizedList(new ArrayList<>());
+    private WebSocketPrincipal creator;
+
+    private final Map<String, WebSocketPrincipal> connectedUsers = new ConcurrentHashMap<>();
 
     private final Map<String, Integer> votes = new ConcurrentHashMap<>();
 
@@ -37,7 +39,7 @@ public class PlanningSession {
         return planningAdminKey;
     }
     */
-    public List<WebSocketPrincipal> getConnectedUsers() {
+    public Map<String, WebSocketPrincipal> getConnectedUsers() {
         return connectedUsers;
     }
 
@@ -72,5 +74,13 @@ public class PlanningSession {
 
     public void setVoteInProgress(boolean voteInProgress) {
         this.voteInProgress = voteInProgress;
+    }
+
+    public WebSocketPrincipal getCreator() {
+        return creator;
+    }
+
+    public void setCreator(WebSocketPrincipal creator) {
+        this.creator = creator;
     }
 }

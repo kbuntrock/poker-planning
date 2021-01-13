@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -34,8 +35,11 @@ public class PlanningService {
         return planningSession;
     }
 
-    public PlanningSession createSession() {
+    public PlanningSession createSession(final String userId, final String username) {
+        WebSocketPrincipal principal = new WebSocketPrincipal(userId);
+        principal.setDisplayName(username);
         PlanningSession newSession = new PlanningSession();
+        newSession.setCreator(principal);
 
         sessions.put(newSession.getPlanningUuid(), newSession);
 
@@ -47,9 +51,7 @@ public class PlanningService {
         // todo vérifier pas déjà enregistré ?
         PlanningSession session = getSession(planningUuid);
 
-        principal.setDisplayName(name);
-
-        session.getConnectedUsers().add(principal);
+        session.getConnectedUsers().put(principal.getName(), principal);
         session.updateActivity();
 
         sendToPlanning(session, MessageType.FULL);
@@ -64,7 +66,7 @@ public class PlanningService {
 
         String userUuid = principal.getName();
 
-        if (session.getConnectedUsers().stream().noneMatch(u -> u.getName().equals(userUuid))) {
+        if (session.getConnectedUsers().values().stream().noneMatch(u -> u.getName().equals(userUuid))) {
             // TODO erreur on est pas enregistré
         }
 
@@ -106,7 +108,8 @@ public class PlanningService {
         output.setType(type.name());
 
         if (MessageType.FULL.equals(type)) {
-            output.setConnectedUsers(session.getConnectedUsers());
+            output.setCreator(session.getCreator());
+            output.setConnectedUsers(new ArrayList<>(session.getConnectedUsers().values()));
             output.setStoryLabel(session.getStoryLabel());
         }
 
