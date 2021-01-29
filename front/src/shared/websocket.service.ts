@@ -26,6 +26,7 @@ export interface WSMessage {
 export class WebsocketService {
 
   private client: Client;
+  private roomId: string = undefined;
 
   private subscriptions: StompSubscription[] = new Array<StompSubscription>();
 
@@ -64,6 +65,7 @@ export class WebsocketService {
       console.info("Déconnexion ...")
       this.state.next(SocketClientState.ATTEMPTING_DISCONNECTION);
       this.client.deactivate();
+      this.roomId = undefined;
     }
   }
 
@@ -88,6 +90,7 @@ export class WebsocketService {
   }
 
   public joinRoom(roomId: string, callback: messageCallbackType){
+    this.roomId = roomId;
     // On souscrit à la room
     this.subscriptions.push(
       this.client.subscribe('/topic/planning/'+roomId, callback)
@@ -98,5 +101,13 @@ export class WebsocketService {
       destination: '/app/planning/'+roomId+'/register',
       body: JSON.stringify({'displayName': this.appProperties.getUsername(), 'name':this.appProperties.getUserId()})
     });
+  }
+
+  public startNewStory(storyName: string, callback: messageCallbackType){
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/newStory',
+      body: storyName
+    });
+
   }
 }

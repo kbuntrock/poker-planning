@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.input-story-name {
+    width: 200px;
+    margin-right: 10px;
+}
+
+
+.story-label {
+    margin-bottom: 0px;
+    margin-right: 10px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}

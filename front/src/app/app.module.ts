@@ -21,6 +21,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { PageNotFoundComponent } from './common/page-not-found/page-not-found.component';
 import { ClipboardModule } from '@angular/cdk/clipboard'; 
 import { MatListModule } from '@angular/material/list';
+import { StoryCreatorComponent } from './room/story-creator/story-creator.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { MatListModule } from '@angular/material/list';
     LoginComponent,
     RoomComponent,
     JoinRoomComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    StoryCreatorComponent
   ],
   imports: [
     ClipboardModule,

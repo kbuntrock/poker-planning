@@ -1,0 +1,9 @@
+<div class="row"><h2 class="story-label">US en cours : </h2><span>{{ libelleUS }}</span></div>
+<div class="row">
+  <div class="input-story-name">
+    <mat-form-field appearance="outline" class="full-width">
+      <input #storylabel matInput placeholder="Prochaine US">
+    </mat-form-field>
+  </div>
+  <button (click)="changerUS(storylabel.value); storylabel.value = ''" mat-raised-button color="accent">Changer</button>
+</div>

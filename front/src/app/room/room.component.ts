@@ -17,10 +17,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   // Indique si l'utilisateur peut proposer des storys
   isScrumMaster: boolean = false;
+  creatingNewRoom: boolean = false;
 
   users: Array<User>;
   creator: User;
-  storyLabel: string
+  storyLabel: string = "..."
 
   subscription: Subscription = new Subscription();
 
@@ -58,6 +59,13 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   copyToClipboard() {
     this.clipboard.copy('http://localhost:4200/room/' + this.roomId);
+  }
+
+  changerUS(libelleUS: string) {
+    this.storyLabel = libelleUS;
+    this.wsService.startNewStory(this.storyLabel, (message) => {
+      console.info(message);
+    });
   }
 
 }

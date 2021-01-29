@@ -13,15 +13,10 @@
         <div class="direct-link"><button (click)="copyToClipboard()" mat-raised-button color="accent">Copy direct link</button></div>
     </div>
     <!-- <h3 class="tc">id :  {{ roomId }}</h3> -->
-    <div *ngIf="storyLabel">
+    <div *ngIf="!isScrumMaster">
         <h1 class="margin-header tc">Story : {{ storyLabel }}</h1>
     </div>
     <div *ngIf="isScrumMaster">
-        <form>
-            <mat-form-field appearance="outline" class="full-width">
-              <input matInput placeholder="Nouvelle story">
-            </mat-form-field>
-            <button mat-raised-button color="accent">Lancer les votes</button>
-        </form>
+        <app-story-creator [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
     </div>
 </div>
