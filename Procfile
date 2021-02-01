@@ -1,0 +1,1 @@
+web: java -jar back/target/poker-back-1.0-SNAPSHOT.jar
