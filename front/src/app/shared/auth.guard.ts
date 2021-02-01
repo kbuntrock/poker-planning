@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router, Params } from '@angular/router';
 import { Observable } from 'rxjs';
 import { PropertiesService } from '../common/properties.service';
 
@@ -19,7 +19,13 @@ export class AuthGuard implements CanActivate {
     if(this.propertiesService.getUsername()){
       return true;
     }
-    this.router.navigate(['login']);
+    let queryParams: Params = undefined;
+    if(next.url.length === 2 && next.url[0].path === 'room'){
+      queryParams = { roomId: next.url[1].path };
+    }
+    this.router.navigate(['login'], {
+      queryParams: queryParams
+    });
     return false;
   }
   

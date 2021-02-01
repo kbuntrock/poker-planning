@@ -1,0 +1,8 @@
+<div class="row">
+<div class="input-story-name">
+    <mat-form-field appearance="outline" class="full-width">
+    <input #vote matInput placeholder="Mon vote?">
+    </mat-form-field>
+</div>
+<button (click)="voter(vote.value);" mat-raised-button color="accent">Voter</button>
+</div>

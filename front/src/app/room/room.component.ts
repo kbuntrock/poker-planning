@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { SocketClientState, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { PropertiesService } from '../common/properties.service';
+import { environment } from '../../environments/environment';
 
 
 @Component({
@@ -18,10 +19,15 @@ export class RoomComponent implements OnInit, OnDestroy {
   // Indique si l'utilisateur peut proposer des storys
   isScrumMaster: boolean = false;
   creatingNewRoom: boolean = false;
+  aVote: boolean = false;
 
   users: Array<User>;
+  usersMap = new Map<string, User>();
   creator: User;
   storyLabel: string = "..."
+
+  votesMap = new Map<number, Array<User>>();
+  votesArray: Array<string> = undefined;
 
   subscription: Subscription = new Subscription();
 
@@ -50,22 +56,105 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private joinRoom() {
     this.wsService.joinRoom(this.roomId, (message) => {
-      const response: WSMessage = JSON.parse(message.body);
-      this.users = response.connectedUsers;
-      this.creator = response.creator;
-      this.isScrumMaster = this.creator.name === this.appProperties.getUserId();
+      this.onPlanningMessage(message.body);
     });
   }
 
+  onPlanningMessage(message: string) {
+    const response: WSMessage = JSON.parse(message);
+    switch(response.type) {
+      case 'FULL' :
+        this.users = this.mapUserArray(response.connectedUsers);
+        this.creator = response.creator;
+        this.isScrumMaster = this.creator.name === this.appProperties.getUserId();
+        if(response.storyLabel) {
+          this.storyLabel = response.storyLabel
+        }
+        this.parseVoted(response.voted);
+        this.parseVotes(response.votes);
+        break;
+      case 'VOTE' : 
+        this.parseVoted(response.voted);
+        this.parseVotes(response.votes);
+        break;
+      default:
+        console.error('type de message non géré');
+        break;
+    }
+  }
+
+  parseVoted(voted: Array<string>) {
+    this.aVote = false;
+    for (const element of this.usersMap.values()) {
+      element.voted = false;
+    }
+    if(voted) {
+      voted.forEach(v => {
+        if(this.appProperties.getUserId() === v){
+          this.aVote = true;
+        }
+        this.usersMap.get(v).voted = true;
+      });
+    }
+   
+  }
+
+  parseVotes(votes: any) {
+    this.votesMap.clear();
+    this.votesArray = undefined;
+    for (const element of this.usersMap.values()) {
+      element.vote = undefined;
+    }
+
+    if(votes) {
+      const keys: string[] = Object.keys(votes);
+      keys.forEach(k => {
+        const user = this.usersMap.get(k);
+        user.vote = +votes[k];
+        if(this.votesMap.has(user.vote)){
+          this.votesMap.get(user.vote).push(user);
+        } else {
+          const userArray = new Array<User>();
+          userArray.push(user);
+          this.votesMap.set(user.vote, userArray);
+        }
+      });
+      this.votesArray = new Array<string>();
+      for (const entry of this.votesMap.entries()) {
+        this.votesArray.push(entry[0] + ' : ' + entry[1].map(x => x.displayName).join(', '));
+      }
+    }
+  }
+
+  mapUserArray(users: Array<User>): Array<User> {
+    this.usersMap.clear();
+    users.forEach(x => {
+      x.voted = false;
+      this.usersMap.set(x.name, x);
+    });
+    return users;
+  }
+
   copyToClipboard() {
-    this.clipboard.copy('http://localhost:4200/room/' + this.roomId);
+    let url = window.location.origin;
+    if(environment.production){
+      url += '/app';
+    }
+    this.clipboard.copy(url + '/room/' + this.roomId);
   }
 
   changerUS(libelleUS: string) {
     this.storyLabel = libelleUS;
-    this.wsService.startNewStory(this.storyLabel, (message) => {
-      console.info(message);
-    });
+    this.wsService.startNewStory(this.storyLabel);
+  }
+
+  voter(vote: number) {
+    this.wsService.voter(vote);
+    this.aVote = true;
+  }
+
+  revelerVotes() {
+    this.wsService.revelerVotes();
   }
 
 }

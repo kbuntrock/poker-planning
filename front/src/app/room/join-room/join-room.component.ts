@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { WebsocketService } from '../../../shared/websocket.service';
 import { Room } from '../room';
 
@@ -19,7 +20,13 @@ export class JoinRoomComponent implements OnInit {
   }
 
   public async createRoom() {
-    const room = await this.http.get<Room>('http://localhost:8080/planning/create', { withCredentials: true }).toPromise();
+
+    let url = 'http://localhost:8080';
+    if(environment.production){
+      url = window.location.origin
+    }
+
+    const room = await this.http.get<Room>(url + '/planning/create', { withCredentials: true }).toPromise();
     this.router.navigate(['room/'+room.planningUuid], { relativeTo: this.route.parent });
   }
 

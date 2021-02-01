@@ -23,7 +23,7 @@ export class PropertiesService {
     }
     if (!this.userId) {
       this.userId = uuid.v4();
-      this.cookieService.set(PropertiesService.USER_ID_COOKIE_NAME, this.userId);
+      this.cookieService.set(PropertiesService.USER_ID_COOKIE_NAME, this.userId, undefined, '/');
     }
   }
 
@@ -33,7 +33,7 @@ export class PropertiesService {
 
   public eraseUsername(): void {
     this.username$.next(undefined);
-    this.cookieService.delete(PropertiesService.USERNAME_COOKIE_NAME);
+    this.cookieService.delete(PropertiesService.USERNAME_COOKIE_NAME, '/');
   }
 
   public getUsername$(): Observable<string> {
@@ -46,7 +46,7 @@ export class PropertiesService {
 
   public setUsername(username: string): void {
     this.username$.next(username);
-    this.cookieService.set(PropertiesService.USERNAME_COOKIE_NAME, username);
+    this.cookieService.set(PropertiesService.USERNAME_COOKIE_NAME, username, undefined, '/');
   }
 
   public hasUsername(): boolean {

@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Client, IFrame, messageCallbackType, Stomp, StompSubscription } from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
 import { PropertiesService } from '../app/common/properties.service';
+import { environment } from '../environments/environment';
 
 export enum SocketClientState {
   ATTEMPTING_CONNECTION, CONNECTED, ATTEMPTING_DISCONNECTION, DISCONNECTED
@@ -10,14 +11,18 @@ export enum SocketClientState {
 
 export interface User {
   name: string,
-  displayName: string
+  displayName: string,
+  voted: boolean,
+  vote: number
 }
 
 export interface WSMessage {
   type: string,
   connectedUsers: Array<User>,
   creator: User,
-  storyLabel: string
+  storyLabel: string,
+  voted: Array<string>,
+  votes: Array<string>
 }
 
 @Injectable({
@@ -36,7 +41,16 @@ export class WebsocketService {
 
     // Important : Il faut passer une fonction capable de renvoyer une nouvelle instance du websocket sous peine de ne pas avoir la reconnection automatique
     // (et de ne pas pouvoir alterner les activate/deactivate)
-    this.client = Stomp.over(() => new SockJS('http://localhost:8080/websocket', null, {transports:['websocket','eventsource','xhr-polling']}));
+
+    console.log("environment.production");
+    console.log(environment.production);
+    let url = 'http://localhost:8080/websocket';
+    if(environment.production){
+      url = window.location.origin + '/websocket'
+    }
+    console.log(url);
+
+    this.client = Stomp.over(() => new SockJS(url, null, {transports:['websocket','eventsource','xhr-polling']}));
 
     this.client.onConnect = this.onConnect;
     this.client.onDisconnect = this.onDisconnect;
@@ -103,10 +117,25 @@ export class WebsocketService {
     });
   }
 
-  public startNewStory(storyName: string, callback: messageCallbackType){
+  public startNewStory(storyName: string){
     this.client.publish({
       destination: '/app/planning/'+this.roomId+'/newStory',
       body: storyName
+    });
+
+  }
+
+  public voter(vote: number) {
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/vote',
+      body: JSON.stringify({'value': vote})
+    });
+
+  }
+
+  public revelerVotes() {
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/reveal'
     });
 
   }

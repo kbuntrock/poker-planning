@@ -22,6 +22,7 @@ import { PageNotFoundComponent } from './common/page-not-found/page-not-found.co
 import { ClipboardModule } from '@angular/cdk/clipboard'; 
 import { MatListModule } from '@angular/material/list';
 import { StoryCreatorComponent } from './room/story-creator/story-creator.component';
+import { VoteInputComponent } from './room/vote-input/vote-input.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { StoryCreatorComponent } from './room/story-creator/story-creator.compon
     RoomComponent,
     JoinRoomComponent,
     PageNotFoundComponent,
-    StoryCreatorComponent
+    StoryCreatorComponent,
+    VoteInputComponent
   ],
   imports: [
     ClipboardModule,

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>fr.bks.pokerPlanning</groupId>
+  <artifactId>poker-front</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
+    <frontend-maven-plugin.nodeVersion>v12.16.2</frontend-maven-plugin.nodeVersion>
+    <frontend-maven-plugin.npmVersion>6.14.4</frontend-maven-plugin.npmVersion>
+  </properties>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>dist/poker-planning</directory>
+        <targetPath>static/app</targetPath>
+      </resource>
+    </resources>
+
+
+    <plugins>
+
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>${frontend-maven-plugin.version}</version>
+        <configuration>
+          <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
+          <npmVersion>${frontend-maven-plugin.npmVersion}</npmVersion>
+          <workingDirectory></workingDirectory>
+          <installDirectory>${project.build.directory}</installDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <id>npm run build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build:prod</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+
+    </plugins>
+  </build>
+
+
+</project>
+
