@@ -19,8 +19,11 @@ public class PlanningService {
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
+    // Map UUID session / planning
     private final Map<UUID, PlanningSession> sessions = new ConcurrentHashMap<>();
 
+    // Map UUID utilisateur / planning (actuellement, limité à un utilisateur = une session max)
+    private final Map<String, PlanningSession> userToSession = new ConcurrentHashMap<>();
 
     private enum MessageType {
         FULL,
@@ -41,6 +44,8 @@ public class PlanningService {
         PlanningSession newSession = new PlanningSession();
         newSession.setCreator(principal);
 
+        userToSession.put(userId, newSession);
+
         sessions.put(newSession.getPlanningUuid(), newSession);
 
         return newSession;
@@ -54,6 +59,17 @@ public class PlanningService {
         session.getConnectedUsers().put(principal.getName(), principal);
         session.updateActivity();
 
+        userToSession.put(principal.getName(), session);
+
+        sendToPlanning(session, MessageType.FULL);
+    }
+
+    public void disconnectUser(WebSocketPrincipal principal) {
+        PlanningSession session = userToSession.get(principal.getName());
+        session.getConnectedUsers().get(principal.getName()).setConnected(false);
+        if(session.getCreator().getName().equals(principal.getName())){
+            session.getCreator().setConnected(false);
+        }
         sendToPlanning(session, MessageType.FULL);
     }
 

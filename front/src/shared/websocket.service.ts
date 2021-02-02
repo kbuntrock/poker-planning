@@ -13,7 +13,8 @@ export interface User {
   name: string,
   displayName: string,
   voted: boolean,
-  vote: number
+  vote: number,
+  connected: boolean
 }
 
 export interface WSMessage {

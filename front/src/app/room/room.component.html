@@ -1,7 +1,7 @@
 <div class="team-panel">
     <h1 class="margin-header tc">Equipe</h1>
     <mat-list>
-        <mat-list-item class="user" *ngFor="let user of users">
+        <mat-list-item [ngClass]="(!user.connected)?'user-disconnected':'user'" *ngFor="let user of users">
             <mat-icon *ngIf="user.name !== creator.name" class="user-icon">account_circle</mat-icon>
             <mat-icon *ngIf="user.name === creator.name" class="user-icon">assignment_ind</mat-icon>
             {{ user.displayName }}

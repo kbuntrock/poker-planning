@@ -7,6 +7,8 @@ public class WebSocketPrincipal implements Principal {
 
     private String displayName;
 
+    private boolean connected = true;
+
     public WebSocketPrincipal(String name) {
         if (name == null) {
             throw new NullPointerException("null name is illegal");
@@ -25,5 +27,13 @@ public class WebSocketPrincipal implements Principal {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 }
