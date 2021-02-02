@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.UUID;
 
@@ -23,6 +24,11 @@ public class PlanningController {
 
     @Autowired
     private PlanningService planningService;
+
+    @GetMapping("")
+    public RedirectView redirectToApp() {
+        return new RedirectView("/app");
+    }
 
     @MessageExceptionHandler
     @SendToUser("/topic/error")
