@@ -7,10 +7,11 @@
     <button (click)="voter(vote.value);" mat-raised-button color="accent">Voter</button>
 </div>
 <div class="row" *ngIf="inputMode==='CARD'">
-    <app-card [numero]="1"></app-card>
-    <app-card [numero]="3"></app-card>
-    <app-card [numero]="5"></app-card>
-    <app-card [numero]="8"></app-card>
-    <app-card [numero]="13"></app-card>
+    <div class="card"><app-card [numero]="1"></app-card></div>
+    <div class="card"><app-card [numero]="3"></app-card></div>
+    <div class="card"><app-card [numero]="5"></app-card></div>
+    <div class="card"><app-card [numero]="8"></app-card></div>
+    <div class="card"><app-card [numero]="13"></app-card></div>
+   
     <button (click)="voter(vote.value);" mat-raised-button color="accent">Voter</button>
 </div>
