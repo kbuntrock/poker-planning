@@ -10,6 +10,9 @@ export class VoteInputComponent implements OnInit {
   @Output() 
   voteEvent = new EventEmitter<number>();
 
+  @Input()
+  inputMode: 'FREE' | 'CARD' = 'FREE';
+
   constructor() { }
 
   ngOnInit(): void {

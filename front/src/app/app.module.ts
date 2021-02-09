@@ -23,6 +23,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatListModule } from '@angular/material/list';
 import { StoryCreatorComponent } from './room/story-creator/story-creator.component';
 import { VoteInputComponent } from './room/vote-input/vote-input.component';
+import { CardComponent } from './room/card/card.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { VoteInputComponent } from './room/vote-input/vote-input.component';
     JoinRoomComponent,
     PageNotFoundComponent,
     StoryCreatorComponent,
-    VoteInputComponent
+    VoteInputComponent,
+    CardComponent
   ],
   imports: [
     ClipboardModule,
