@@ -4,14 +4,12 @@
         <input #vote matInput placeholder="Mon vote?">
         </mat-form-field>
     </div>
-    <button (click)="voter(vote.value);" mat-raised-button color="accent">Voter</button>
+    <button (click)="voterInput(vote.value);" mat-raised-button color="accent">Voter</button>
 </div>
 <div class="row" *ngIf="inputMode==='CARD'">
-    <div class="card"><app-card [numero]="1"></app-card></div>
-    <div class="card"><app-card [numero]="3"></app-card></div>
-    <div class="card"><app-card [numero]="5"></app-card></div>
-    <div class="card"><app-card [numero]="8"></app-card></div>
-    <div class="card"><app-card [numero]="13"></app-card></div>
-   
-    <button (click)="voter(vote.value);" mat-raised-button color="accent">Voter</button>
+
+    <div *ngFor="let card of cards" class="card"><app-card [numero]="card.numero" [selected]="card.selected"
+         (selectedNumber)="selectCard($event)"></app-card></div>
+    
 </div>
+<button (click)="voterCard();" mat-raised-button color="accent">Voter</button>

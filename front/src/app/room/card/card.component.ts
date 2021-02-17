@@ -1,3 +1,4 @@
+import { EventEmitter, Output } from '@angular/core';
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
@@ -10,7 +11,12 @@ export class CardComponent implements OnInit {
   @Input()
   numero: number;
 
+  @Input()
   selected: boolean = false;
+
+  @Output() 
+  selectedNumber = new EventEmitter<number>();
+
 
   constructor() { }
 
@@ -18,7 +24,10 @@ export class CardComponent implements OnInit {
   }
 
   select() {
-    this.selected = !this.selected;
+    if(!this.selected) {
+      this.selectedNumber.emit(this.numero);
+    }
+   
   }
 
 }

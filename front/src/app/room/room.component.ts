@@ -19,7 +19,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   // Indique si l'utilisateur peut proposer des storys
   isScrumMaster: boolean = false;
   creatingNewRoom: boolean = false;
-  aVote: boolean = false;
+  aVote: boolean = true;
 
   users: Array<User>;
   usersMap = new Map<string, User>();
