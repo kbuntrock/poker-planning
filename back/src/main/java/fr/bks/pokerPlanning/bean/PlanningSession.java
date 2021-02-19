@@ -27,7 +27,7 @@ public class PlanningSession {
 
     private boolean voteInProgress;
 
-    private Instant lastActivity = Instant.now(); // usefull for automatic cleaning (TODO)
+    private Instant lastActivity = Instant.now(); // usefull for automatic cleaning
 
     public UUID getPlanningUuid() {
         return planningUuid;

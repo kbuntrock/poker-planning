@@ -3,18 +3,30 @@ package fr.bks.pokerPlanning.service;
 import fr.bks.pokerPlanning.bean.PlanningOutputMessage;
 import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PlanningService {
+
+    private static Logger LOG = LoggerFactory.getLogger(PlanningService.class);
+
+    public static final String CLEAN_JOB_FREQUENCY_EL = "#{${planner.planning.clean-frequency-second}*1000}";
+
+    @Value("${planner.planning.max-age-hour}")
+    public int planningMaxAgeHour;
 
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
@@ -67,7 +79,7 @@ public class PlanningService {
     public void disconnectUser(WebSocketPrincipal principal) {
         PlanningSession session = userToSession.get(principal.getName());
         session.getConnectedUsers().get(principal.getName()).setConnected(false);
-        if(session.getCreator().getName().equals(principal.getName())){
+        if (session.getCreator().getName().equals(principal.getName())) {
             session.getCreator().setConnected(false);
         }
         sendToPlanning(session, MessageType.FULL);
@@ -136,6 +148,18 @@ public class PlanningService {
         }
 
         messagingTemplate.convertAndSend("/topic/planning/" + session.getPlanningUuid().toString(), output);
+    }
+
+    @Scheduled(fixedDelayString = CLEAN_JOB_FREQUENCY_EL, initialDelayString = CLEAN_JOB_FREQUENCY_EL)
+    public void cleanOldPlannings() {
+        LOG.info("Clean old plannings job");
+
+        Instant timeLimit = Instant.now().minus(planningMaxAgeHour, ChronoUnit.HOURS);
+
+        int prevSize = sessions.size();
+        sessions.entrySet().removeIf(e -> e.getValue().getLastActivity().isBefore(timeLimit));
+
+        LOG.info("  " + sessions.size() + " plannings remaining (" + (prevSize - sessions.size()) + " deleted)");
     }
 
 }

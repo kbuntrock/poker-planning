@@ -1,0 +1,4 @@
+planner:
+  .planning:
+    .max-age-hour: 24
+    .clean-frequency-second: 3600 # 1 hour
