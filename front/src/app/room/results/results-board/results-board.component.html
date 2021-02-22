@@ -1,0 +1,28 @@
+<h1>Résultats</h1>
+<div class="board">
+    <app-results-chart [votesMap]="votesMap"></app-results-chart>
+    <div class="indicateurs">
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Moyenne :  {{ averageValue | number: '1.1' }}</mat-card-title>
+            </mat-card-header>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Minimum : {{ minimumValue }}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                {{ minimumValueVoters }}
+            </mat-card-content>
+        </mat-card>
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Maximum : {{ maximumValue }}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                {{ maximumValueVoters }}
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
+

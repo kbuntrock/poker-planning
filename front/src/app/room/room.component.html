@@ -25,11 +25,7 @@
         <div class="direct-link"><button (click)="revelerVotes()" mat-raised-button color="accent">Révéler</button></div>
     </div>
     <app-vote-input [inputMode]="'CARD'" *ngIf="!aVote && votesArray === undefined" (voteEvent)="voter($event)"></app-vote-input>
-    <div *ngIf="votesArray !== undefined">
-        <mat-list>
-            <mat-list-item *ngFor="let vote of votesArray">
-                {{ vote }}
-            </mat-list-item>
-        </mat-list>
+    <div *ngIf="votesMap.size !== 0">
+        <app-results-board class="results" [votesMap]="votesMap"></app-results-board>
     </div>
 </div>

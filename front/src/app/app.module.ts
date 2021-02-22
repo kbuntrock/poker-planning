@@ -19,11 +19,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { JoinRoomComponent } from './room/join-room/join-room.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PageNotFoundComponent } from './common/page-not-found/page-not-found.component';
-import { ClipboardModule } from '@angular/cdk/clipboard'; 
+import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatListModule } from '@angular/material/list';
 import { StoryCreatorComponent } from './room/story-creator/story-creator.component';
 import { VoteInputComponent } from './room/vote-input/vote-input.component';
 import { CardComponent } from './room/card/card.component';
+import { ChartsModule } from 'ng2-charts';
+import { ResultsChartComponent } from './room/results/results-chart/results-chart.component';
+import { ResultsBoardComponent } from './room/results/results-board/results-board.component';
 
 @NgModule({
   declarations: [
@@ -35,9 +38,12 @@ import { CardComponent } from './room/card/card.component';
     PageNotFoundComponent,
     StoryCreatorComponent,
     VoteInputComponent,
-    CardComponent
+    CardComponent,
+    ResultsChartComponent,
+    ResultsBoardComponent,
   ],
   imports: [
+    ChartsModule,
     ClipboardModule,
     BrowserModule,
     AppRoutingModule,
@@ -52,9 +58,9 @@ import { CardComponent } from './room/card/card.component';
     MatIconModule,
     MatMenuModule,
     HttpClientModule,
-    MatListModule
+    MatListModule,
   ],
   providers: [CookieService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
