@@ -3,22 +3,20 @@ package fr.bks.pokerPlanning.websocket;
 import java.security.Principal;
 
 public class WebSocketPrincipal implements Principal {
-    private String name;
+    private String id;
 
     private String displayName;
 
-    private boolean connected = true;
-
-    public WebSocketPrincipal(String name) {
-        if (name == null) {
-            throw new NullPointerException("null name is illegal");
+    public WebSocketPrincipal(String id) {
+        if (id == null) {
+            throw new NullPointerException("null id is illegal");
         }
-        this.name = name;
+        this.id = id;
     }
 
     @Override
     public String getName() {
-        return name;
+        return id;
     }
 
     public String getDisplayName() {
@@ -29,11 +27,4 @@ public class WebSocketPrincipal implements Principal {
         this.displayName = displayName;
     }
 
-    public boolean isConnected() {
-        return connected;
-    }
-
-    public void setConnected(boolean connected) {
-        this.connected = connected;
-    }
 }

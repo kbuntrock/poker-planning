@@ -12,7 +12,7 @@ public class PlanningOutputMessage {
 
     private WebSocketPrincipal creator;
 
-    private List<WebSocketPrincipal> connectedUsers;
+    private List<User> connectedUsers;
 
     private String storyLabel;
 
@@ -28,11 +28,11 @@ public class PlanningOutputMessage {
         this.type = type;
     }
 
-    public List<WebSocketPrincipal> getConnectedUsers() {
+    public List<User> getConnectedUsers() {
         return connectedUsers;
     }
 
-    public void setConnectedUsers(List<WebSocketPrincipal> connectedUsers) {
+    public void setConnectedUsers(List<User> connectedUsers) {
         this.connectedUsers = connectedUsers;
     }
 

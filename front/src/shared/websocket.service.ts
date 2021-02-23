@@ -111,6 +111,9 @@ export class WebsocketService {
     this.subscriptions.push(
       this.client.subscribe('/topic/planning/'+roomId, callback)
     );
+    this.subscriptions.push(
+      this.client.subscribe('/user/topic/planning/'+roomId, callback)
+    );
     // et on s'enregistre dessus en tant qu'utilisateur
     console.info(JSON.stringify({'displayName': this.appProperties.getUsername(), 'name':this.appProperties.getUserId()}));
     this.client.publish({

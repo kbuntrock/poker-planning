@@ -31,7 +31,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
 
-  constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService, 
+  constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService,
     private clipboard: Clipboard, private readonly appProperties: PropertiesService) { }
 
   ngOnInit(): void {
@@ -47,7 +47,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       // On est déjà connecté, on rejoint la room directement
       this.joinRoom();
     }
-    
+
   }
 
   ngOnDestroy() {
@@ -64,6 +64,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     const response: WSMessage = JSON.parse(message);
     switch(response.type) {
       case 'FULL' :
+      case 'STATE' :
         this.users = this.mapUserArray(response.connectedUsers);
         this.creator = response.creator;
         this.isScrumMaster = this.creator.name === this.appProperties.getUserId();
@@ -73,7 +74,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.parseVoted(response.voted);
         this.parseVotes(response.votes);
         break;
-      case 'VOTE' : 
+      case 'VOTE' :
         this.parseVoted(response.voted);
         this.parseVotes(response.votes);
         break;
@@ -96,7 +97,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.usersMap.get(v).voted = true;
       });
     }
-   
+
   }
 
   parseVotes(votes: any) {

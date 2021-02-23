@@ -4,7 +4,8 @@ import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -17,7 +18,7 @@ public class PlanningSession {
 
     private WebSocketPrincipal creator;
 
-    private final Map<String, WebSocketPrincipal> connectedUsers = new ConcurrentHashMap<>();
+    private final Map<String, User> connectedUsers = new ConcurrentHashMap<>();
 
     private final Map<String, Integer> votes = new ConcurrentHashMap<>();
 
@@ -39,7 +40,7 @@ public class PlanningSession {
         return planningAdminKey;
     }
     */
-    public Map<String, WebSocketPrincipal> getConnectedUsers() {
+    public Map<String, User> getConnectedUsers() {
         return connectedUsers;
     }
 

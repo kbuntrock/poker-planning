@@ -1,15 +1,15 @@
 package fr.bks.pokerPlanning.controller;
 
-import fr.bks.pokerPlanning.bean.PlanningRegisterMessage;
 import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.bean.PlanningVoteMessage;
 import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -45,8 +45,8 @@ public class PlanningController {
 
 
     @MessageMapping("/planning/{planningUuid}/register")
-    public void register(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, PlanningRegisterMessage inputMessage) {
-        planningService.register(planningUuid, principal, inputMessage.getName());
+    public void register(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, Message inputMessage) {
+        planningService.register(planningUuid, principal, inputMessage.getHeaders().get(SimpMessageHeaderAccessor.SESSION_ID_HEADER, String.class));
     }
 
     // todo changer de nom, on repasse par register ou méthode dédiée ?

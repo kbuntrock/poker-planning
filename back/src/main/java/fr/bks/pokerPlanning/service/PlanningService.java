@@ -2,12 +2,15 @@ package fr.bks.pokerPlanning.service;
 
 import fr.bks.pokerPlanning.bean.PlanningOutputMessage;
 import fr.bks.pokerPlanning.bean.PlanningSession;
+import fr.bks.pokerPlanning.bean.User;
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +37,12 @@ public class PlanningService {
     // Map UUID session / planning
     private final Map<UUID, PlanningSession> sessions = new ConcurrentHashMap<>();
 
-    // Map UUID utilisateur / planning (actuellement, limité à un utilisateur = une session max)
-    private final Map<String, PlanningSession> userToSession = new ConcurrentHashMap<>();
+    // Map websocket Id / User
+    private final Map<String, User> wsIdToUser = new ConcurrentHashMap<>();
 
     private enum MessageType {
         FULL,
+        STATE,
         VOTE;
     }
 
@@ -56,33 +60,41 @@ public class PlanningService {
         PlanningSession newSession = new PlanningSession();
         newSession.setCreator(principal);
 
-        userToSession.put(userId, newSession);
-
         sessions.put(newSession.getPlanningUuid(), newSession);
 
         return newSession;
     }
 
 
-    public void register(UUID planningUuid, WebSocketPrincipal principal, String name) {
+    public void register(UUID planningUuid, WebSocketPrincipal principal, String wsId) {
         // todo vérifier pas déjà enregistré ?
         PlanningSession session = getSession(planningUuid);
 
-        session.getConnectedUsers().put(principal.getName(), principal);
+        User user = session.getConnectedUsers().get(principal.getName());
+        if (user == null) {
+            user = new User(principal, session);
+            session.getConnectedUsers().put(principal.getName(), user);
+        }
+        wsIdToUser.put(wsId, user);
+
+        boolean wasConnected = user.isConnected();
+        user.connectBy(wsId);
+        if (!wasConnected) {
+            sendToPlanning(session, MessageType.STATE);
+        }
+
+        sendToWsSession(user.getName(), wsId, session, MessageType.FULL);
+
         session.updateActivity();
-
-        userToSession.put(principal.getName(), session);
-
-        sendToPlanning(session, MessageType.FULL);
     }
 
-    public void disconnectUser(WebSocketPrincipal principal) {
-        PlanningSession session = userToSession.get(principal.getName());
-        session.getConnectedUsers().get(principal.getName()).setConnected(false);
-        if (session.getCreator().getName().equals(principal.getName())) {
-            session.getCreator().setConnected(false);
+    public void disconnectUser(String wsId) {
+        User user = wsIdToUser.get(wsId);
+        user.disconnectBy(wsId);
+
+        if (!user.isConnected()) {
+            sendToPlanning(user.getSession(), MessageType.FULL);
         }
-        sendToPlanning(session, MessageType.FULL);
     }
 
     public void vote(UUID planningUuid, WebSocketPrincipal principal, Integer value) {
@@ -132,10 +144,26 @@ public class PlanningService {
     }
 
     private void sendToPlanning(PlanningSession session, MessageType type) {
+        PlanningOutputMessage output = getPlanningOutputMessage(session, type);
+
+        messagingTemplate.convertAndSend("/topic/planning/" + session.getPlanningUuid().toString(), output);
+    }
+
+    private void sendToWsSession(String userName, String wsId, PlanningSession session, MessageType type) {
+        PlanningOutputMessage output = getPlanningOutputMessage(session, type);
+
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        headerAccessor.setSessionId(wsId);
+        headerAccessor.setLeaveMutable(true);
+
+        messagingTemplate.convertAndSendToUser(userName, "/topic/planning/" + session.getPlanningUuid().toString(), output, headerAccessor.getMessageHeaders());
+    }
+
+    private PlanningOutputMessage getPlanningOutputMessage(PlanningSession session, MessageType type) {
         PlanningOutputMessage output = new PlanningOutputMessage();
         output.setType(type.name());
 
-        if (MessageType.FULL.equals(type)) {
+        if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {
             output.setCreator(session.getCreator());
             output.setConnectedUsers(new ArrayList<>(session.getConnectedUsers().values()));
             output.setStoryLabel(session.getStoryLabel());
@@ -146,8 +174,7 @@ public class PlanningService {
         } else {
             output.setVotes(session.getVotes());
         }
-
-        messagingTemplate.convertAndSend("/topic/planning/" + session.getPlanningUuid().toString(), output);
+        return output;
     }
 
     @Scheduled(fixedDelayString = CLEAN_JOB_FREQUENCY_EL, initialDelayString = CLEAN_JOB_FREQUENCY_EL)
