@@ -27,7 +27,7 @@ public class PlanningController {
 
     @GetMapping("")
     public RedirectView redirectToApp() {
-        return new RedirectView("/app");
+        return new RedirectView("/app", true);
     }
 
     @MessageExceptionHandler

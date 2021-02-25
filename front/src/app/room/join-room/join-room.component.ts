@@ -1,3 +1,4 @@
+import { PlatformLocation } from '@angular/common'
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,22 +12,25 @@ import { Room } from '../room';
   styleUrls: ['./join-room.component.scss']
 })
 export class JoinRoomComponent implements OnInit {
+  private url: string
 
   constructor(private http: HttpClient, private wsService: WebsocketService,
-    private readonly router: Router, 
-    private readonly route: ActivatedRoute) { }
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly platformLocation: PlatformLocation) {
+
+    if(environment.production){
+      this.url = window.location.origin + platformLocation.getBaseHrefFromDOM() + '..'
+    } else {
+      this.url = 'http://localhost:8080/' + platformLocation.getBaseHrefFromDOM() + '..';
+    }
+  }
 
   ngOnInit(): void {
   }
 
   public async createRoom() {
-
-    let url = 'http://localhost:8080';
-    if(environment.production){
-      url = window.location.origin
-    }
-
-    const room = await this.http.get<Room>(url + '/planning/create', { withCredentials: true }).toPromise();
+    const room = await this.http.get<Room>(this.url + '/planning/create', { withCredentials: true }).toPromise();
     this.router.navigate(['room/'+room.planningUuid], { relativeTo: this.route.parent });
   }
 
