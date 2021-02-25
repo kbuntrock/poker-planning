@@ -38,9 +38,8 @@ public class PlanningController {
 
     @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true") // Autorise le CORS pour le devmode
     @GetMapping("/planning/create")
-    public PlanningSession createPlanning(@CookieValue(value = "userId", required = true) String userId,
-                                          @CookieValue(value = "username", required = true) String username) {
-        return planningService.createSession(userId, username);
+    public PlanningSession createPlanning(@CookieValue(value = "userId", required = true) String userId) {
+        return planningService.createSession(userId);
     }
 
 

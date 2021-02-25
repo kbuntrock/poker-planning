@@ -23,7 +23,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   users: Array<User>;
   usersMap = new Map<string, User>();
-  creator: User;
+  adminList: Array<string> = undefined;
   storyLabel: string = "..."
 
   votesMap = new Map<number, Array<User>>();
@@ -66,8 +66,8 @@ export class RoomComponent implements OnInit, OnDestroy {
       case 'FULL' :
       case 'STATE' :
         this.users = this.mapUserArray(response.connectedUsers);
-        this.creator = response.creator;
-        this.isScrumMaster = this.creator.name === this.appProperties.getUserId();
+        this.adminList = response.adminList;
+        this.isScrumMaster = this.adminList.includes(this.appProperties.getUserId());
         if(response.storyLabel) {
           this.storyLabel = response.storyLabel
         }

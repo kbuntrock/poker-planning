@@ -21,7 +21,7 @@ export interface User {
 export interface WSMessage {
   type: string,
   connectedUsers: Array<User>,
-  creator: User,
+  adminList: Array<string>,
   storyLabel: string,
   voted: Array<string>,
   votes: Array<string>

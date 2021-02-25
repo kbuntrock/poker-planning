@@ -1,8 +1,6 @@
 package fr.bks.pokerPlanning.service;
 
-import fr.bks.pokerPlanning.bean.PlanningOutputMessage;
-import fr.bks.pokerPlanning.bean.PlanningSession;
-import fr.bks.pokerPlanning.bean.User;
+import fr.bks.pokerPlanning.bean.*;
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +52,9 @@ public class PlanningService {
         return planningSession;
     }
 
-    public PlanningSession createSession(final String userId, final String username) {
-        WebSocketPrincipal principal = new WebSocketPrincipal(userId);
-        principal.setDisplayName(username);
+    public PlanningSession createSession(final String userId) {
         PlanningSession newSession = new PlanningSession();
-        newSession.setCreator(principal);
+        newSession.getAdminList().add(userId);
 
         sessions.put(newSession.getPlanningUuid(), newSession);
 
@@ -67,13 +63,17 @@ public class PlanningService {
 
 
     public void register(UUID planningUuid, WebSocketPrincipal principal, String wsId) {
-        // todo vérifier pas déjà enregistré ?
         PlanningSession session = getSession(planningUuid);
 
-        User user = session.getConnectedUsers().get(principal.getName());
+        User user = session.getState().getConnectedUsers().get(principal.getName());
         if (user == null) {
             user = new User(principal, session);
-            session.getConnectedUsers().put(principal.getName(), user);
+            session.getState().getConnectedUsers().put(principal.getName(), user);
+        } else {
+            // security check, first to register fixes the secret key
+            if (!user.getSecretKey().equals(principal.getSecretKey())) {
+                throw new SecurityException("You seems changed to me...");
+            }
         }
         wsIdToUser.put(wsId, user);
 
@@ -90,27 +90,29 @@ public class PlanningService {
 
     public void disconnectUser(String wsId) {
         User user = wsIdToUser.get(wsId);
-        user.disconnectBy(wsId);
+        if (user != null) {
+            user.disconnectBy(wsId);
 
-        if (!user.isConnected()) {
-            sendToPlanning(user.getSession(), MessageType.FULL);
+            if (!user.isConnected()) {
+                sendToPlanning(user.getSession(), MessageType.FULL);
+            }
         }
     }
 
     public void vote(UUID planningUuid, WebSocketPrincipal principal, Integer value) {
         PlanningSession session = getSession(planningUuid);
 
-        if (!session.isVoteInProgress()) {
+        if (!session.getState().isVoteInProgress()) {
             throw new IllegalStateException("No vote is in progress");
         }
 
         String userUuid = principal.getName();
 
-        if (session.getConnectedUsers().values().stream().noneMatch(u -> u.getName().equals(userUuid))) {
+        if (session.getState().getConnectedUsers().values().stream().noneMatch(u -> u.getName().equals(userUuid))) {
             // TODO erreur on est pas enregistré
         }
 
-        session.getVotes().put(userUuid, value);
+        session.getState().getVotes().put(userUuid, value);
         session.updateActivity();
 
         sendToPlanning(session, MessageType.VOTE);
@@ -118,27 +120,36 @@ public class PlanningService {
 
     public void newStory(UUID planningUuid, String label) {
         PlanningSession session = getSession(planningUuid);
+        State sessionState = session.getState();
 
-        if (session.isVoteInProgress()) {
+        if (sessionState.isVoteInProgress()) {
             throw new IllegalStateException("Vote is already in progress");
         }
 
-        session.setVoteInProgress(true);
+        sessionState.setVoteInProgress(true);
 
-        session.getVotes().clear();
-        session.setStoryLabel(label);
+        sessionState.getVotes().clear();
+        sessionState.setStoryLabel(label);
 
-        sendToPlanning(session, MessageType.FULL);
+        sendToPlanning(session, MessageType.STATE);
     }
+
 
     public void reveal(UUID planningUuid) {
         PlanningSession session = getSession(planningUuid);
+        State sessionState = session.getState();
 
-        if (!session.isVoteInProgress()) {
+        if (!sessionState.isVoteInProgress()) {
             throw new IllegalStateException("No vote is in progress");
         }
 
-        session.setVoteInProgress(false);
+
+
+        // TODO : après le reveal on peux laisser l'admin faire le choix de la valeur retenue ou lancer un revote, ensuite ne fois validé c'est la ou on le met dans la lsite archivée
+        Story story = new Story(sessionState.getStoryLabel(), sessionState.getVotes());
+        session.getStories().add(story);
+
+        sessionState.setVoteInProgress(false);
 
         sendToPlanning(session, MessageType.FULL);
     }
@@ -163,16 +174,20 @@ public class PlanningService {
         PlanningOutputMessage output = new PlanningOutputMessage();
         output.setType(type.name());
 
-        if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {
-            output.setCreator(session.getCreator());
-            output.setConnectedUsers(new ArrayList<>(session.getConnectedUsers().values()));
-            output.setStoryLabel(session.getStoryLabel());
+        if (MessageType.FULL.equals(type)) {
+            output.setStories(session.getStories());
         }
 
-        if (session.isVoteInProgress()) {
-            output.setVoted(session.getVotes().keySet());
+        if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {
+            output.setAdminList(session.getAdminList());
+            output.setConnectedUsers(new ArrayList<>(session.getState().getConnectedUsers().values()));
+            output.setStoryLabel(session.getState().getStoryLabel());
+        }
+
+        if (session.getState().isVoteInProgress()) {
+            output.setVoted(session.getState().getVotes().keySet());
         } else {
-            output.setVotes(session.getVotes());
+            output.setVotes(session.getState().getVotes());
         }
         return output;
     }

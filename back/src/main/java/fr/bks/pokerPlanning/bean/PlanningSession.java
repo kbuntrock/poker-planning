@@ -4,29 +4,19 @@ import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class PlanningSession {
 
-
     private final UUID planningUuid = UUID.randomUUID();
-
     // private final UUID planningAdminKey = UUID.randomUUID();
 
-    private WebSocketPrincipal creator;
+    private Set<String> adminList = new HashSet<>();
 
-    private final Map<String, User> connectedUsers = new ConcurrentHashMap<>();
-
-    private final Map<String, Integer> votes = new ConcurrentHashMap<>();
-
-    //private final List<Story> stories = new ArrayList<>();
-
-    private String storyLabel;
-
-    private boolean voteInProgress;
+    private final State state = new State();
+    private final List<Story> stories = new ArrayList<>();
 
     private Instant lastActivity = Instant.now(); // usefull for automatic cleaning
 
@@ -40,14 +30,7 @@ public class PlanningSession {
         return planningAdminKey;
     }
     */
-    public Map<String, User> getConnectedUsers() {
-        return connectedUsers;
-    }
 
-
-    // public List<Story> getStories() {
-    //    return stories;
-    // }
     public Instant getLastActivity() {
         return lastActivity;
     }
@@ -56,32 +39,19 @@ public class PlanningSession {
         this.lastActivity = Instant.now();
     }
 
-    public String getStoryLabel() {
-        return storyLabel;
+    public Set<String> getAdminList() {
+        return adminList;
     }
 
-    public void setStoryLabel(String storyLabel) {
-        this.storyLabel = storyLabel;
+    public void setAdminList(Set<String> adminList) {
+        this.adminList = adminList;
     }
 
-
-    public Map<String, Integer> getVotes() {
-        return votes;
+    public State getState() {
+        return state;
     }
 
-    public boolean isVoteInProgress() {
-        return voteInProgress;
-    }
-
-    public void setVoteInProgress(boolean voteInProgress) {
-        this.voteInProgress = voteInProgress;
-    }
-
-    public WebSocketPrincipal getCreator() {
-        return creator;
-    }
-
-    public void setCreator(WebSocketPrincipal creator) {
-        this.creator = creator;
+    public List<Story> getStories() {
+        return stories;
     }
 }

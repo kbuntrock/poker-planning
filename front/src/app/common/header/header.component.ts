@@ -14,7 +14,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
   public showMenu = false;
 
-  constructor(private readonly propertiesService: PropertiesService, 
+  constructor(private readonly propertiesService: PropertiesService,
     private readonly wsService: WebsocketService,
     private readonly router: Router) { }
 
@@ -30,7 +30,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   public deconnecter(): void {
     this.wsService.disconnect();
-    this.propertiesService.eraseUsername();
+    this.propertiesService.disconnect();
     this.router.navigate(['login']);
   }
 

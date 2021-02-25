@@ -1,17 +1,18 @@
 package fr.bks.pokerPlanning.websocket;
 
 import java.security.Principal;
+import java.util.UUID;
 
 public class WebSocketPrincipal implements Principal {
     private String id;
 
     private String displayName;
+    private String secretKey;
 
-    public WebSocketPrincipal(String id) {
-        if (id == null) {
-            throw new NullPointerException("null id is illegal");
-        }
+    public WebSocketPrincipal(String id, String displayName, String secretKey) {
         this.id = id;
+        this.displayName = displayName;
+        this.secretKey = secretKey;
     }
 
     @Override
@@ -27,4 +28,11 @@ public class WebSocketPrincipal implements Principal {
         this.displayName = displayName;
     }
 
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
 }

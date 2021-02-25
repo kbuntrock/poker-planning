@@ -1,6 +1,7 @@
 package fr.bks.pokerPlanning.websocket;
 
 import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -25,26 +26,25 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
     protected Principal determineUser(ServerHttpRequest request,
                                       WebSocketHandler wsHandler,
                                       Map<String, Object> attributes) {
-        // generate user name by UUID
         List<String> cookieHeaders = request.getHeaders().get("cookie");
         if(!cookieHeaders.isEmpty()){
             try{
                 String cookieString = URLDecoder.decode(cookieHeaders.get(0), StandardCharsets.UTF_8.name());
                 String[] cookieStrings = cookieString.split(";");
-                Map<String, HttpCookie> cookieJar = new HashMap<>();
+                Map<String, String> cookieJar = new HashMap<>();
                 for(String s : cookieStrings){
                     List<HttpCookie> cookie = HttpCookie.parse(s);
-                    cookieJar.put(cookie.get(0).getName(), cookie.get(0));
+                    cookieJar.put(cookie.get(0).getName(), cookie.get(0).getValue());
                 }
-                WebSocketPrincipal principal = new WebSocketPrincipal(cookieJar.get("userId").getValue());
-                principal.setDisplayName(cookieJar.get("username").getValue());
-                return principal;
+                String id = cookieJar.get("userId");
+                String displayName = cookieJar.get("username");
+                String key = cookieJar.get("userKey");
+
+                return new WebSocketPrincipal(id, displayName, key);
             } catch(UnsupportedEncodingException ex){
                 throw new RuntimeException(ex);
             }
-            // TODO : rejeter la requête si les cookies n'ont pas été envoyés. Et supprimer la connexion par défaut ci-dessous.
         }
-        return new WebSocketPrincipal(UUID.randomUUID().toString()); // todo: ne plus se baser sur un id généré à la co mais plutot par un id métier généré côté UI et envoyé au register ?
-        // todo suite : en l'absence d'authent c'est sans doute le plus simple pour prendre en charge le fait de se reco "en tant que le même user"
+        throw new SecurityException("Need cookie authent");
     }
 }

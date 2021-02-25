@@ -15,6 +15,9 @@ public class User {
     private String displayName;
 
     @JsonIgnore
+    private final String secretKey;
+
+    @JsonIgnore
     private final PlanningSession session;
     @JsonIgnore
     private List<String> wsIdList = new ArrayList<>();
@@ -23,6 +26,7 @@ public class User {
         this.name = principal.getName();
         this.displayName = principal.getDisplayName();
         this.session = session;
+        this.secretKey = principal.getSecretKey();
     }
 
     public String getName() {
@@ -57,5 +61,9 @@ public class User {
 
     public PlanningSession getSession() {
         return session;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 }

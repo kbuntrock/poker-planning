@@ -1,7 +1,6 @@
 package fr.bks.pokerPlanning.bean;
 
-import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,14 +9,12 @@ public class PlanningOutputMessage {
 
     private String type;
 
-    private WebSocketPrincipal creator;
+    private List<Story> stories = new ArrayList<>();
 
+    private Set<String> adminList;
     private List<User> connectedUsers;
-
     private String storyLabel;
-
     private Set<String> voted;
-
     private Map<String, Integer> votes;
 
     public String getType() {
@@ -26,6 +23,14 @@ public class PlanningOutputMessage {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<Story> getStories() {
+        return stories;
+    }
+
+    public void setStories(List<Story> stories) {
+        this.stories = stories;
     }
 
     public List<User> getConnectedUsers() {
@@ -60,11 +65,11 @@ public class PlanningOutputMessage {
         this.votes = votes;
     }
 
-    public WebSocketPrincipal getCreator() {
-        return creator;
+    public Set<String> getAdminList() {
+        return adminList;
     }
 
-    public void setCreator(WebSocketPrincipal creator) {
-        this.creator = creator;
+    public void setAdminList(Set<String> adminList) {
+        this.adminList = adminList;
     }
 }
