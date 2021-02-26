@@ -30,13 +30,13 @@ public class PlanningService {
     public int planningMaxAgeHour;
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
     // Map UUID session / planning
     private final Map<UUID, PlanningSession> sessions = new ConcurrentHashMap<>();
-
-    // Map websocket Id / User
-    private final Map<String, User> wsIdToUser = new ConcurrentHashMap<>();
 
     private enum MessageType {
         FULL,
@@ -62,8 +62,13 @@ public class PlanningService {
     }
 
 
-    public void register(UUID planningUuid, WebSocketPrincipal principal, String wsId) {
+    public void register(UUID planningUuid) {
+        securityService.checkNotAnonymous();
+
+        WebSocketPrincipal principal = securityService.getPrincipal();
+
         PlanningSession session = getSession(planningUuid);
+        String wsId = principal.getWsId();
 
         User user = session.getState().getConnectedUsers().get(principal.getName());
         if (user == null) {
@@ -75,10 +80,10 @@ public class PlanningService {
                 throw new SecurityException("You seems changed to me...");
             }
         }
-        wsIdToUser.put(wsId, user);
-
         boolean wasConnected = user.isConnected();
-        user.connectBy(wsId);
+
+        securityService.registerUser(user);
+
         if (!wasConnected) {
             sendToPlanning(session, MessageType.STATE);
         }
@@ -89,9 +94,9 @@ public class PlanningService {
     }
 
     public void disconnectUser(String wsId) {
-        User user = wsIdToUser.get(wsId);
+        User user = securityService.getUser();
         if (user != null) {
-            user.disconnectBy(wsId);
+            securityService.unregisterUser(user);
 
             if (!user.isConnected()) {
                 sendToPlanning(user.getSession(), MessageType.FULL);
@@ -99,26 +104,27 @@ public class PlanningService {
         }
     }
 
-    public void vote(UUID planningUuid, WebSocketPrincipal principal, Integer value) {
+    public void vote(UUID planningUuid, Integer value) {
+        securityService.checkNotAnonymous()
+                .checkBelongToPlanning(planningUuid);
+
         PlanningSession session = getSession(planningUuid);
 
         if (!session.getState().isVoteInProgress()) {
             throw new IllegalStateException("No vote is in progress");
         }
 
-        String userUuid = principal.getName();
-
-        if (session.getState().getConnectedUsers().values().stream().noneMatch(u -> u.getName().equals(userUuid))) {
-            // TODO erreur on est pas enregistré
-        }
-
-        session.getState().getVotes().put(userUuid, value);
+        session.getState().getVotes().put(securityService.getUser().getName(), value);
         session.updateActivity();
 
         sendToPlanning(session, MessageType.VOTE);
     }
 
     public void newStory(UUID planningUuid, String label) {
+        securityService.checkNotAnonymous()
+                .checkBelongToPlanning(planningUuid)
+                .checkIfAdmin();
+
         PlanningSession session = getSession(planningUuid);
         State sessionState = session.getState();
 
@@ -136,13 +142,16 @@ public class PlanningService {
 
 
     public void reveal(UUID planningUuid) {
+        securityService.checkNotAnonymous()
+                .checkBelongToPlanning(planningUuid)
+                .checkIfAdmin();
+
         PlanningSession session = getSession(planningUuid);
         State sessionState = session.getState();
 
         if (!sessionState.isVoteInProgress()) {
             throw new IllegalStateException("No vote is in progress");
         }
-
 
 
         // TODO : après le reveal on peux laisser l'admin faire le choix de la valeur retenue ou lancer un revote, ensuite ne fois validé c'est la ou on le met dans la lsite archivée

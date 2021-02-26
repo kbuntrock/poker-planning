@@ -3,13 +3,12 @@ package fr.bks.pokerPlanning.controller;
 import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.bean.PlanningVoteMessage;
 import fr.bks.pokerPlanning.service.PlanningService;
+import fr.bks.pokerPlanning.service.SecurityService;
 import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,6 +23,9 @@ public class PlanningController {
 
     @Autowired
     private PlanningService planningService;
+
+    @Autowired
+    private SecurityService securityService;
 
     @GetMapping("")
     public RedirectView redirectToApp() {
@@ -44,21 +46,24 @@ public class PlanningController {
 
 
     @MessageMapping("/planning/{planningUuid}/register")
-    public void register(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, Message inputMessage) {
-        planningService.register(planningUuid, principal, inputMessage.getHeaders().get(SimpMessageHeaderAccessor.SESSION_ID_HEADER, String.class));
+    public void register(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal) {
+        securityService.registerPrincipal(principal);
+        planningService.register(planningUuid);
     }
 
     // todo changer de nom, on repasse par register ou méthode dédiée ?
 
     @MessageMapping("/planning/{planningUuid}/vote")
-    public void vote(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, PlanningVoteMessage inputMessage) {
-        planningService.vote(planningUuid, principal, inputMessage.getValue());
+    public void vote(@DestinationVariable UUID planningUuid, PlanningVoteMessage inputMessage, WebSocketPrincipal principal) {
+        securityService.registerPrincipal(principal);
+        planningService.vote(planningUuid, inputMessage.getValue());
     }
 
     // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/newStory")
     // public void newStory(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal, String label) {
     @MessageMapping("/planning/{planningUuid}/newStory")
-    public void newStory(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal, String label) {
+    public void newStory(@DestinationVariable UUID planningUuid, String label, WebSocketPrincipal principal) {
+        securityService.registerPrincipal(principal);
         planningService.newStory(planningUuid, label);
     }
 
@@ -66,6 +71,7 @@ public class PlanningController {
     // public void reveal(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal) {
     @MessageMapping("/planning/{planningUuid}/reveal")
     public void reveal(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal) {
+        securityService.registerPrincipal(principal);
         planningService.reveal(planningUuid);
     }
 

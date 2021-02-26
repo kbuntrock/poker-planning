@@ -1,18 +1,20 @@
 package fr.bks.pokerPlanning.websocket;
 
 import java.security.Principal;
-import java.util.UUID;
 
 public class WebSocketPrincipal implements Principal {
-    private String id;
+    private final String id;
 
     private String displayName;
-    private String secretKey;
+    private final String secretKey;
 
-    public WebSocketPrincipal(String id, String displayName, String secretKey) {
+    private final String wsId;
+
+    public WebSocketPrincipal(String id, String displayName, String secretKey, String wsId) {
         this.id = id;
         this.displayName = displayName;
         this.secretKey = secretKey;
+        this.wsId = wsId;
     }
 
     @Override
@@ -32,7 +34,8 @@ public class WebSocketPrincipal implements Principal {
         return secretKey;
     }
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public String getWsId() {
+        return wsId;
     }
+
 }

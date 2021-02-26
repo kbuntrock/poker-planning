@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SocketClientState, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
@@ -32,7 +32,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   subscription: Subscription = new Subscription();
 
   constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService,
-    private clipboard: Clipboard, private readonly appProperties: PropertiesService) { }
+    private clipboard: Clipboard, private readonly appProperties: PropertiesService,
+    private readonly ngZone: NgZone  ) { }
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
@@ -56,7 +57,9 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private joinRoom() {
     this.wsService.joinRoom(this.roomId, (message) => {
-      this.onPlanningMessage(message.body);
+      this.ngZone.run( () => { // when using serverSentEvent, changes are not in angular zone and become unreactive
+        this.onPlanningMessage(message.body);
+      });
     });
   }
 
