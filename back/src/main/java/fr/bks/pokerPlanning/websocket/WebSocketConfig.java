@@ -10,15 +10,17 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.messaging.WebSocketAnnotationMethodMessageHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.util.WebUtils;
 
@@ -54,7 +56,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("http://localhost:4200") // Autorisation des CORS pour le devmode
                 .withSockJS()
                 .setInterceptors(httpSessionHandshakeInterceptor())
-                //.setWebSocketEnabled(false)
+        //.setWebSocketEnabled(false)
         ;
     }
 
@@ -89,7 +91,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
+        registration.interceptors(new ExecutorChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -114,6 +116,37 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 }
 
                 return message;
+            }
+
+            @Override
+            public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
+                if (handler instanceof WebSocketAnnotationMethodMessageHandler) {
+                    StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                    switch (accessor.getCommand()) {
+                        case SEND:
+                            securityService.registerPrincipal((WebSocketPrincipal) accessor.getUser());
+                            break;
+                        default:
+                            // nothing
+                    }
+                }
+
+                return message;
+            }
+
+            @Override
+            public void afterMessageHandled(Message<?> message, MessageChannel channel, MessageHandler handler, Exception ex) {
+                if (handler instanceof WebSocketAnnotationMethodMessageHandler) {
+                    StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                    switch (accessor.getCommand()) {
+                        case SEND:
+                            System.out.println("Unregister " + Thread.currentThread().getName());
+                            securityService.unRegisterPrincipal((WebSocketPrincipal) accessor.getUser());
+                            break;
+                        default:
+                            // nothing
+                    }
+                }
             }
         });
 

@@ -4,7 +4,6 @@ import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.bean.PlanningVoteMessage;
 import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.service.SecurityService;
-import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -46,32 +45,29 @@ public class PlanningController {
 
 
     @MessageMapping("/planning/{planningUuid}/register")
-    public void register(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal) {
-        securityService.registerPrincipal(principal);
+    public void register(@DestinationVariable UUID planningUuid) {
+        System.out.println("metier " + Thread.currentThread().getName());
         planningService.register(planningUuid);
     }
 
     // todo changer de nom, on repasse par register ou méthode dédiée ?
 
     @MessageMapping("/planning/{planningUuid}/vote")
-    public void vote(@DestinationVariable UUID planningUuid, PlanningVoteMessage inputMessage, WebSocketPrincipal principal) {
-        securityService.registerPrincipal(principal);
+    public void vote(@DestinationVariable UUID planningUuid, PlanningVoteMessage inputMessage) {
         planningService.vote(planningUuid, inputMessage.getValue());
     }
 
     // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/newStory")
     // public void newStory(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal, String label) {
     @MessageMapping("/planning/{planningUuid}/newStory")
-    public void newStory(@DestinationVariable UUID planningUuid, String label, WebSocketPrincipal principal) {
-        securityService.registerPrincipal(principal);
+    public void newStory(@DestinationVariable UUID planningUuid, String label) {
         planningService.newStory(planningUuid, label);
     }
 
     // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/reveal")
     // public void reveal(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal) {
     @MessageMapping("/planning/{planningUuid}/reveal")
-    public void reveal(@DestinationVariable UUID planningUuid, WebSocketPrincipal principal) {
-        securityService.registerPrincipal(principal);
+    public void reveal(@DestinationVariable UUID planningUuid) {
         planningService.reveal(planningUuid);
     }
 
