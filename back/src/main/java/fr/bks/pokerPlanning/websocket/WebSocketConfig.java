@@ -140,7 +140,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
                     switch (accessor.getCommand()) {
                         case SEND:
-                            System.out.println("Unregister " + Thread.currentThread().getName());
                             securityService.unRegisterPrincipal((WebSocketPrincipal) accessor.getUser());
                             break;
                         default:

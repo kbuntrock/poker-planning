@@ -46,7 +46,6 @@ public class PlanningController {
 
     @MessageMapping("/planning/{planningUuid}/register")
     public void register(@DestinationVariable UUID planningUuid) {
-        System.out.println("metier " + Thread.currentThread().getName());
         planningService.register(planningUuid);
     }
 
