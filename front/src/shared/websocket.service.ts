@@ -41,17 +41,10 @@ export class WebsocketService {
 
   constructor( private readonly appProperties: PropertiesService, private readonly platformLocation: PlatformLocation) {
 
+    let url = window.location.origin + platformLocation.getBaseHrefFromDOM() + '../api/websocket'
+
     // Important : Il faut passer une fonction capable de renvoyer une nouvelle instance du websocket sous peine de ne pas avoir la reconnection automatique
     // (et de ne pas pouvoir alterner les activate/deactivate)
-
-    console.log("environment.production");
-    console.log(environment.production);
-    let url = 'http://localhost:8080/' + platformLocation.getBaseHrefFromDOM() + '../websocket';
-    if(environment.production){
-      url = window.location.origin + platformLocation.getBaseHrefFromDOM() + '../websocket'
-    }
-    console.log(url);
-
     this.client = Stomp.over(() => new SockJS(url, null, {transports:['websocket','eventsource','xhr-polling']}));
 
     this.client.onConnect = this.onConnect;
@@ -94,6 +87,7 @@ export class WebsocketService {
       // Souscription aux erreurs
       this.subscriptions.push(this.client.subscribe('/user/topic/error', function (errorText) {
         console.error('topic error : ' + errorText);
+        console.error(errorText);
       }));
 
   }

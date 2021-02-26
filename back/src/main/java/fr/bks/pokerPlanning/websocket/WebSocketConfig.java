@@ -2,6 +2,7 @@ package fr.bks.pokerPlanning.websocket;
 
 import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.service.SecurityService;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -52,11 +54,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                .addEndpoint("/websocket")
+                .addEndpoint("/api/websocket")
                 .setAllowedOrigins("http://localhost:4200") // Autorisation des CORS pour le devmode
                 .withSockJS()
                 .setInterceptors(httpSessionHandshakeInterceptor())
-        //.setWebSocketEnabled(false)
+                //.setWebSocketEnabled(false)
         ;
     }
 

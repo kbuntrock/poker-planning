@@ -9,15 +9,13 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/api/")
 public class PlanningController {
 
     @Autowired

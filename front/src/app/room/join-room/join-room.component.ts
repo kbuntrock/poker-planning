@@ -19,11 +19,7 @@ export class JoinRoomComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly platformLocation: PlatformLocation) {
 
-    if(environment.production){
-      this.url = window.location.origin + platformLocation.getBaseHrefFromDOM() + '..'
-    } else {
-      this.url = 'http://localhost:8080/' + platformLocation.getBaseHrefFromDOM() + '..';
-    }
+    this.url = window.location.origin + platformLocation.getBaseHrefFromDOM() + '../api'
   }
 
   ngOnInit(): void {
