@@ -35,8 +35,8 @@ export class LoginComponent implements OnInit {
 
   onSubmit(value: any) {
     if(this.loginForm.valid) {
-      this.wsService.connect();
       this.appProperties.setUsername(value.username);
+      this.wsService.connect();
       if(this.roomId){
         this.router.navigate(['room', this.roomId]);
       }else {

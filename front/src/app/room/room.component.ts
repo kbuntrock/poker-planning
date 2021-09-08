@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, NgZone } from '@angular/core';
+import { PlatformLocation } from '@angular/common'
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SocketClientState, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
@@ -33,7 +34,8 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService,
     private clipboard: Clipboard, private readonly appProperties: PropertiesService,
-    private readonly ngZone: NgZone  ) { }
+    private readonly ngZone: NgZone,
+    private readonly platformLocation: PlatformLocation)  { }
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
@@ -140,11 +142,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   copyToClipboard() {
-    let url = window.location.origin;
-    if(environment.production){
-      url += '/app';
-    }
-    this.clipboard.copy(url + '/room/' + this.roomId);
+    let url = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'room/' + this.roomId;
+    console.info('copy url : '+url);
+    this.clipboard.copy(url);
   }
 
   changerUS(libelleUS: string) {

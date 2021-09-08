@@ -27,6 +27,9 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,7 +106,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
                         String userId = (String) sessionAttributes.get(USER_ID_COOKIE_NAME);
                         String userKey = (String) sessionAttributes.get(USERKEY_COOKIE_NAME);
-                        String userName = (String) sessionAttributes.get(USERNAME_COOKIE_NAME);
+                        String encodedUserName = (String) sessionAttributes.get(USERNAME_COOKIE_NAME);
+                        String userName = URLDecoder.decode(encodedUserName, StandardCharsets.UTF_8);
 
                         WebSocketPrincipal principal = new WebSocketPrincipal(userId, userName, userKey, accessor.getSessionId());
                         accessor.setUser(principal);

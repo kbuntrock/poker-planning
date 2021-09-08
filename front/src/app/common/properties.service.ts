@@ -25,7 +25,10 @@ export class PropertiesService {
       this.userKey = this.cookieService.get(PropertiesService.USERKEY_COOKIE_NAME);
     }
     if (this.cookieService.check(PropertiesService.USERNAME_COOKIE_NAME)) {
-      this.username$.next(this.cookieService.get(PropertiesService.USERNAME_COOKIE_NAME));
+      const username = this.cookieService.get(PropertiesService.USERNAME_COOKIE_NAME);
+      console.info('username saved : ');
+      console.info(username);
+      this.username$.next(username);
     }
 
     this.initIdIfNeeded();
@@ -53,6 +56,8 @@ export class PropertiesService {
   }
 
   public setUsername(username: string): void {
+    console.info('we go there');
+    console.info('username set : ' + username);
     this.username$.next(username);
     this.initIdIfNeeded();
   }
@@ -72,6 +77,9 @@ export class PropertiesService {
       // always set cookies to reset max-age
       this.cookieService.set(PropertiesService.USER_ID_COOKIE_NAME, this.userId, PropertiesService.COOKIE_MAX_AGE, '/');
       this.cookieService.set(PropertiesService.USERKEY_COOKIE_NAME, this.userKey, PropertiesService.COOKIE_MAX_AGE, '/');
-      this.cookieService.set(PropertiesService.USERNAME_COOKIE_NAME, this.username$.getValue(), PropertiesService.COOKIE_MAX_AGE, '/');
+      if(this.getUsername()){
+        this.cookieService.set(PropertiesService.USERNAME_COOKIE_NAME, this.username$.getValue(), PropertiesService.COOKIE_MAX_AGE, '/');
+      }
+     
   }
 }
