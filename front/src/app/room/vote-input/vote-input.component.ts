@@ -12,11 +12,14 @@ export interface Card {
 })
 export class VoteInputComponent implements OnInit {
 
-  @Output() 
+  @Output()
   voteEvent = new EventEmitter<number>();
 
   @Input()
   inputMode: 'FREE' | 'CARD' = 'FREE';
+
+  @Input()
+  myVote: number;
 
   cards: Array<Card> = [
     {numero: 1, selected: false},
@@ -62,7 +65,7 @@ export class VoteInputComponent implements OnInit {
     if(vote){
       this.voteEvent.emit(vote);
     }
-    
+
   }
 
 }
