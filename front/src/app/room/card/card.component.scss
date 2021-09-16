@@ -20,6 +20,11 @@
     //box-shadow: 0 4px 8px 0 rgb(67, 160, 71, 1) !important;
 }
 
+.voted {
+    box-shadow: 0 0 0 4pt  rgb(160, 67, 71, 1) !important;
+    //box-shadow: 0 4px 8px 0 rgb(67, 160, 71, 1) !important;
+}
+
 .card:hover {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
 }

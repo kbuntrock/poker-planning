@@ -19,6 +19,9 @@ export class VoteInputComponent implements OnInit {
   inputMode: 'FREE' | 'CARD' = 'FREE';
 
   @Input()
+  myVote: number;
+
+  @Input()
   voteValues: Array<number>;
 
   cards: Array<Card>;

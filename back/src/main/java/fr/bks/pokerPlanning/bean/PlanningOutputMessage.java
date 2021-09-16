@@ -15,6 +15,7 @@ public class PlanningOutputMessage {
     private List<User> connectedUsers;
     private String storyLabel;
     private Set<String> voted;
+    private Integer myVote;
     private Map<String, Integer> votes;
 
     public String getType() {
@@ -63,6 +64,14 @@ public class PlanningOutputMessage {
 
     public void setVoted(Set<String> voted) {
         this.voted = voted;
+    }
+
+    public Integer getMyVote() {
+        return myVote;
+    }
+
+    public void setMyVote(Integer myVote) {
+        this.myVote = myVote;
     }
 
     public Map<String, Integer> getVotes() {

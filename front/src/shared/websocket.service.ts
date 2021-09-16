@@ -25,6 +25,7 @@ export interface WSMessage {
   adminList: Array<string>,
   storyLabel: string,
   voted: Array<string>,
+  myVote: number,
   votes: Array<string>
 }
 

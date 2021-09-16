@@ -21,7 +21,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   // Indique si l'utilisateur peut proposer des storys
   isScrumMaster: boolean = false;
   creatingNewRoom: boolean = false;
-  aVote: boolean = true;
+  voteInProgress: boolean = false;
+  myVote: number;
 
   users: Array<User>;
   usersMap = new Map<string, User>();
@@ -47,7 +48,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.joinRoom();
         }
       }));
-    }else {
+    } else {
       // On est déjà connecté, on rejoint la room directement
       this.joinRoom();
     }
@@ -83,6 +84,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         console.error('type de message non géré');
         break;
     }
+    if (response.myVote) this.myVote = response.myVote;
   }
 
   parseFull(response: WSMessage) {
@@ -102,17 +104,19 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   parseVoted(voted: Array<string>) {
-    this.aVote = false;
+    let aVote = false;
     for (const element of this.usersMap.values()) {
       element.voted = false;
     }
     if(voted) {
       voted.forEach(v => {
         if(this.appProperties.getUserId() === v){
-          this.aVote = true;
+          aVote = true;
         }
         this.usersMap.get(v).voted = true;
       });
+
+      if (!aVote) this.myVote = undefined;
     }
 
   }
@@ -123,6 +127,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     for (const element of this.usersMap.values()) {
       element.vote = undefined;
     }
+    this.voteInProgress = !votes;
 
     if(votes) {
       const keys: string[] = Object.keys(votes);
@@ -166,7 +171,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   voter(vote: number) {
     this.wsService.voter(vote);
-    this.aVote = true;
+    this.myVote = vote;
   }
 
   revelerVotes() {

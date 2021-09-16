@@ -176,6 +176,8 @@ public class PlanningService {
     private void sendToWsSession(String userName, String wsId, PlanningSession session, MessageType type) {
         PlanningOutputMessage output = getPlanningOutputMessage(session, type);
 
+        output.setMyVote(session.getState().getVotes().get(securityService.getUser().getName()));
+
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
         headerAccessor.setSessionId(wsId);
         headerAccessor.setLeaveMutable(true);

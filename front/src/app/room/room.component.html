@@ -18,13 +18,13 @@
     <div *ngIf="!isScrumMaster">
         <h1 class="margin-header tc">Story : {{ storyLabel }}</h1>
     </div>
-    <div *ngIf="isScrumMaster">
+    <div *ngIf="isScrumMaster && !voteInProgress">
         <app-story-creator [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
     </div>
-    <div *ngIf="isScrumMaster && votesArray === undefined">
+    <div *ngIf="isScrumMaster && voteInProgress">
         <div class="direct-link"><button (click)="revelerVotes()" mat-raised-button color="accent">Révéler</button></div>
     </div>
-    <app-vote-input [inputMode]="'CARD'" [voteValues]="voteValues" *ngIf="!aVote && votesArray === undefined" (voteEvent)="voter($event)"></app-vote-input>
+    <app-vote-input [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" *ngIf="voteInProgress" (voteEvent)="voter($event)"></app-vote-input>
     <div *ngIf="votesMap.size !== 0">
         <app-results-board class="results" [votesMap]="votesMap"></app-results-board>
     </div>

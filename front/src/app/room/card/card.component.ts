@@ -14,7 +14,10 @@ export class CardComponent implements OnInit {
   @Input()
   selected: boolean = false;
 
-  @Output() 
+  @Input()
+  voted: boolean = false;
+
+  @Output()
   selectedNumber = new EventEmitter<number>();
 
 
@@ -27,7 +30,7 @@ export class CardComponent implements OnInit {
     if(!this.selected) {
       this.selectedNumber.emit(this.numero);
     }
-   
+
   }
 
 }
