@@ -1,6 +1,5 @@
 package fr.bks.pokerPlanning.bean;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,7 +8,8 @@ public class PlanningOutputMessage {
 
     private String type;
 
-    private List<Story> stories = new ArrayList<>();
+    private List<Story> stories;
+    private List<Integer> voteValues;
 
     private Set<String> adminList;
     private List<User> connectedUsers;
@@ -30,8 +30,16 @@ public class PlanningOutputMessage {
         return stories;
     }
 
+    public List<Integer> getVoteValues() {
+        return voteValues;
+    }
+
     public void setStories(List<Story> stories) {
         this.stories = stories;
+    }
+
+    public void setVoteValues(List<Integer> voteValues) {
+        this.voteValues = voteValues;
     }
 
     public List<User> getConnectedUsers() {

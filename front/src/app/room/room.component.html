@@ -24,7 +24,7 @@
     <div *ngIf="isScrumMaster && voteInProgress">
         <div class="direct-link"><button (click)="revelerVotes()" mat-raised-button color="accent">Révéler</button></div>
     </div>
-    <app-vote-input [inputMode]="'CARD'" [myVote]="myVote" *ngIf="voteInProgress" (voteEvent)="voter($event)"></app-vote-input>
+    <app-vote-input [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" *ngIf="voteInProgress" (voteEvent)="voter($event)"></app-vote-input>
     <div *ngIf="votesMap.size !== 0">
         <app-results-board class="results" [votesMap]="votesMap"></app-results-board>
     </div>

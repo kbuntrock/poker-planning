@@ -114,6 +114,10 @@ public class PlanningService {
             throw new IllegalStateException("No vote is in progress");
         }
 
+        if (!session.getVoteValues().contains(value)) {
+            throw new IllegalStateException("Invalid vote value");
+        }
+
         session.getState().getVotes().put(securityService.getUser().getName(), value);
         session.updateActivity();
 
@@ -187,6 +191,7 @@ public class PlanningService {
 
         if (MessageType.FULL.equals(type)) {
             output.setStories(session.getStories());
+            output.setVoteValues(session.getVoteValues());
         }
 
         if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {
