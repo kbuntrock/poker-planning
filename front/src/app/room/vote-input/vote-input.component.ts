@@ -12,29 +12,26 @@ export interface Card {
 })
 export class VoteInputComponent implements OnInit {
 
-  @Output() 
+  @Output()
   voteEvent = new EventEmitter<number>();
 
   @Input()
   inputMode: 'FREE' | 'CARD' = 'FREE';
 
-  cards: Array<Card> = [
-    {numero: 1, selected: false},
-    {numero: 2, selected: false},
-    {numero: 3, selected: false},
-    {numero: 5, selected: false},
-    {numero: 8, selected: false},
-    {numero: 13, selected: false},
-    {numero: 21, selected: false},
-    {numero: 34, selected: false},
-    {numero: 55, selected: false},
-    {numero: 89, selected: false},
-    {numero: 144, selected: false}
-  ];
+  @Input()
+  voteValues: Array<number>;
+
+  cards: Array<Card>;
 
   constructor() { }
 
-  ngOnInit(): void {
+  ngOnInit(): void { }
+
+  ngOnChanges(): void {
+    if (this.voteValues) {
+      this.cards = [];
+      this.voteValues.forEach(e => this.cards.push({numero: e, selected: false}));
+    }
   }
 
   voterInput(vote: string) {
@@ -62,7 +59,7 @@ export class VoteInputComponent implements OnInit {
     if(vote){
       this.voteEvent.emit(vote);
     }
-    
+
   }
 
 }

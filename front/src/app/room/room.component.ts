@@ -16,6 +16,7 @@ import { environment } from '../../environments/environment';
 export class RoomComponent implements OnInit, OnDestroy {
 
   roomId: string;
+  voteValues: Array<number>;
 
   // Indique si l'utilisateur peut proposer des storys
   isScrumMaster: boolean = false;
@@ -69,15 +70,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     const response: WSMessage = JSON.parse(message);
     switch(response.type) {
       case 'FULL' :
+        this.parseFull(response);
+        break;
       case 'STATE' :
-        this.users = this.mapUserArray(response.connectedUsers);
-        this.adminList = response.adminList;
-        this.isScrumMaster = this.adminList.includes(this.appProperties.getUserId());
-        if(response.storyLabel) {
-          this.storyLabel = response.storyLabel
-        }
-        this.parseVoted(response.voted);
-        this.parseVotes(response.votes);
+        this.parseState(response);
         break;
       case 'VOTE' :
         this.parseVoted(response.voted);
@@ -87,6 +83,22 @@ export class RoomComponent implements OnInit, OnDestroy {
         console.error('type de message non géré');
         break;
     }
+  }
+
+  parseFull(response: WSMessage) {
+    this.voteValues = response.voteValues;
+    this.parseState(response);
+  }
+
+  parseState(response: WSMessage) {
+    this.users = this.mapUserArray(response.connectedUsers);
+    this.adminList = response.adminList;
+    this.isScrumMaster = this.adminList.includes(this.appProperties.getUserId());
+    if(response.storyLabel) {
+      this.storyLabel = response.storyLabel
+    }
+    this.parseVoted(response.voted);
+    this.parseVotes(response.votes);
   }
 
   parseVoted(voted: Array<string>) {
