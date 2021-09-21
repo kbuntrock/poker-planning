@@ -23,6 +23,8 @@ export class ResultsBoardComponent implements OnInit {
   maximumValueVoters: string;
   averageValue: number = 12.5;
 
+  nbVoters: number = 1;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -43,6 +45,7 @@ export class ResultsBoardComponent implements OnInit {
     });
 
     this.averageValue = total/nb;
+    this.nbVoters = nb;
 
   }
 

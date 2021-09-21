@@ -19,6 +19,12 @@ export class ResultsChartComponent implements OnInit {
   @Input()
   voteValues: Array<number>;
 
+  /**
+   * Défini la valeur max en y. Si non défini, sera le plus grand nombre de votes
+   */
+  @Input()
+  maxAxisY: number;
+
   public barChartOptions: ChartOptions = {
     responsive: true,
     // We use these empty structures as placeholders for dynamic theming.
@@ -62,27 +68,27 @@ export class ResultsChartComponent implements OnInit {
 
   ngOnInit(): void {
 
-    console.info("display : ");
-    console.info(this.votesMap);
+    // Réglage max sur l'axe y
+    if(this.maxAxisY) {
+      this.barChartOptions.scales.yAxes[0].ticks.max = this.maxAxisY;
+    }
 
     const label: Array<string[]> = [];
     const data: Array<number> = [];
 
     this.voteValues.forEach((v, k, m) => {
-      //data.push(0);
-      //label.push([]);
+      data.push(0);
+      label.push([''+v]);
     });
 
-
     this.votesMap.forEach((value, key, map) => {
-      console.info(key);
-      let l = new Array<string>();
-      l.push(''+key);
+      
+      const index = this.voteValues.findIndex(v => v === key);
+      const l = label[index];
       value.forEach((v, i, a) => {
         l.push(v.displayName);
       });
-      label.push(l);
-      data.push(value.length);
+      data[index] = value.length;
     });
     this.barChartLabels = label;
     this.barChartData[0].data = data;
