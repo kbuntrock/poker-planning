@@ -11,31 +11,23 @@ export class ResultsBoardComponent implements OnInit {
   @Input()
   votesMap = new Map<number, Array<User>>();
 
+   /**
+   * Toutes les valeurs de vote qui sont possibles
+   */
+  @Input()
+  voteValues: Array<number>;
+
   minimumValue: number;
   minimumValueVoters: string;
   maximumValue: number;
   maximumValueVoters: string;
   averageValue: number = 12.5;
 
+  nbVoters: number = 1;
+
   constructor() { }
 
   ngOnInit(): void {
-    // this.votesMap.set(5, [
-    //   {name:'xxx', displayName:"John",  connected: true, vote:5, voted:true},
-    //   {name:'xxx', displayName:"Bob",  connected: true, vote:5, voted:true}]);
-    // this.votesMap.set(144, [
-    //   {name:'xxx', displayName:"Bernard",  connected: true, vote:5, voted:true},
-    //   {name:'xxx', displayName:"Franck",  connected: true, vote:5, voted:true},
-    //   {name:'xxx', displayName:"Mickaël",  connected: true, vote:5, voted:true},
-    //   {name:'xxx', displayName:"J-M",  connected: true, vote:5, voted:true},
-    //   {name:'xxx', displayName:"Matthieu",  connected: true, vote:5, voted:true},
-    //   {name:'xxx', displayName:"Michel",  connected: true, vote:5, voted:true}
-    // ]);
-    // this.votesMap.set(8, [
-    //   {name:'xxx', displayName:"Dédé",  connected: true, vote:5, voted:true}]);
-    // this.votesMap.set(3, [
-    //   {name:'xxx', displayName:"Joe",  connected: true, vote:5, voted:true}]);
-    
     this.votesMap = this.sortMapByKeys(this.votesMap);
 
     const keys = Array.from(this.votesMap.keys());
@@ -53,6 +45,7 @@ export class ResultsBoardComponent implements OnInit {
     });
 
     this.averageValue = total/nb;
+    this.nbVoters = nb;
 
   }
 

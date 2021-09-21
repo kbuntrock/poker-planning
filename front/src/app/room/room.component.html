@@ -26,6 +26,6 @@
     </div>
     <app-vote-input [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" *ngIf="voteInProgress" (voteEvent)="voter($event)"></app-vote-input>
     <div *ngIf="votesMap.size !== 0">
-        <app-results-board class="results" [votesMap]="votesMap"></app-results-board>
+        <app-results-board class="results" [votesMap]="votesMap" [voteValues]="voteValues"></app-results-board>
     </div>
 </div>

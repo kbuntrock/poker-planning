@@ -13,6 +13,18 @@ export class ResultsChartComponent implements OnInit {
   @Input()
   votesMap = new Map<number, Array<User>>();
 
+  /**
+   * Toutes les valeurs de vote qui sont possibles
+   */
+  @Input()
+  voteValues: Array<number>;
+
+  /**
+   * Défini la valeur max en y. Si non défini, sera le plus grand nombre de votes
+   */
+  @Input()
+  maxAxisY: number;
+
   public barChartOptions: ChartOptions = {
     responsive: true,
     // We use these empty structures as placeholders for dynamic theming.
@@ -22,7 +34,7 @@ export class ResultsChartComponent implements OnInit {
         labelString: 'Cartes'
       }
     }], yAxes: [
-      { ticks: 
+      { ticks:
         { beginAtZero: true,
           stepSize: 1
         },
@@ -42,10 +54,10 @@ export class ResultsChartComponent implements OnInit {
   public barChartType: ChartType = 'bar';
   public barChartLegend = false;
   public barChartData: ChartDataSets[] = [
-    { data: [], 
-      label: 'Nombre de voix', 
-      backgroundColor: 'rgba(67, 160, 71, 0.8)', 
-      hoverBackgroundColor: 'rgba(67, 160, 71, 0.8)', 
+    { data: [],
+      label: 'Nombre de voix',
+      backgroundColor: 'rgba(67, 160, 71, 0.8)',
+      hoverBackgroundColor: 'rgba(67, 160, 71, 0.8)',
       hoverBorderColor: 'rgba(67, 160, 71, 0.8)',
       borderWidth: 5,
       hoverBorderWidth: 5,
@@ -56,20 +68,31 @@ export class ResultsChartComponent implements OnInit {
 
   ngOnInit(): void {
 
+    // Réglage max sur l'axe y
+    if(this.maxAxisY) {
+      this.barChartOptions.scales.yAxes[0].ticks.max = this.maxAxisY;
+    }
+
     const label: Array<string[]> = [];
     const data: Array<number> = [];
+
+    this.voteValues.forEach((v, k, m) => {
+      data.push(0);
+      label.push([''+v]);
+    });
+
     this.votesMap.forEach((value, key, map) => {
-      let l = new Array<string>();
-      l.push(''+key);
+      
+      const index = this.voteValues.findIndex(v => v === key);
+      const l = label[index];
       value.forEach((v, i, a) => {
         l.push(v.displayName);
       });
-      label.push(l);
-      data.push(value.length);
+      data[index] = value.length;
     });
     this.barChartLabels = label;
     this.barChartData[0].data = data;
-   
+
   }
 
 }
