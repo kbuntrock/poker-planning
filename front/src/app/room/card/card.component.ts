@@ -12,6 +12,9 @@ export class CardComponent implements OnInit {
   numero: number;
 
   @Input()
+  color: string;
+
+  @Input()
   selected: boolean = false;
 
   @Input()

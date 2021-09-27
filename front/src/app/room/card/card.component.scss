@@ -3,6 +3,7 @@
     height: 150px;
     background-size: contain;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5);
+    //box-shadow: 0 4px 8px 0;
     transition: 0.3s;
     border-radius: 5px;
     transition: box-shadow 0s;
@@ -13,19 +14,19 @@
     font-size: 4em;
     cursor: pointer;
     user-select: none;
+    transition: 0.3s;
 }
 
 .selected {
-    box-shadow: 0 0 0 4pt  rgb(67, 160, 71, 1) !important;
-    //box-shadow: 0 4px 8px 0 rgb(67, 160, 71, 1) !important;
+    box-shadow: 0 0 0 4pt rgb(67, 160, 71, 1) !important;
 }
 
 .voted {
     box-shadow: 0 0 0 4pt  rgb(160, 67, 71, 1) !important;
-    //box-shadow: 0 4px 8px 0 rgb(67, 160, 71, 1) !important;
 }
 
 .card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
+    box-shadow: 0 6px 12px 0;
+    //box-shadow: 0 8px 16px 0;
 }
 
