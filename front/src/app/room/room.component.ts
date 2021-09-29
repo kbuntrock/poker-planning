@@ -6,7 +6,15 @@ import { SocketClientState, User, WebsocketService, WSMessage } from '../../shar
 import { Clipboard } from '@angular/cdk/clipboard';
 import { PropertiesService } from '../common/properties.service';
 import { environment } from '../../environments/environment';
+import { VoteValue } from '../model/vote-value';
 
+enum ColorScheme {
+  Green = "Green",
+  GreenToRed = "Green to red",
+  Rainbow = "Rainbow",
+  BlueGradient = "Blue Gradient",
+  BlueGradient2 = "Blue Gradient 2"
+}
 
 @Component({
   selector: 'app-room',
@@ -16,7 +24,8 @@ import { environment } from '../../environments/environment';
 export class RoomComponent implements OnInit, OnDestroy {
 
   roomId: string;
-  voteValues: Array<number>;
+  voteValues: Array<VoteValue>;
+  colorScheme: ColorScheme = ColorScheme.GreenToRed;
 
   // Indique si l'utilisateur peut proposer des storys
   isScrumMaster: boolean = false;
@@ -88,8 +97,37 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   parseFull(response: WSMessage) {
-    this.voteValues = response.voteValues;
+    this.voteValues = [];
+    response.voteValues.forEach(v => {
+      this.voteValues.push(new VoteValue(v));
+    });
+    this.computeVoteValuesColors();
     this.parseState(response);
+  }
+
+  computeVoteValuesColors() {
+    this.voteValues.forEach((v, idx) => {
+      const percentage: number = idx / (this.voteValues.length - 1);
+      switch (this.colorScheme) {
+        case ColorScheme.Rainbow:
+          v.setColor(percentage, 120, 360, 70, 80, 90, 90);
+        break;
+        case ColorScheme.GreenToRed:
+          v.setColor(percentage, 120, 0, 70, 80, 90, 90);
+        break;
+        case ColorScheme.BlueGradient:
+          v.setColor(percentage, 200, 220, 10, 100, 100, 75);
+        break;
+        case ColorScheme.BlueGradient2:
+          v.setColor(percentage, 180, 250, 30, 70, 100, 90);
+        break;
+        case ColorScheme.Green:
+          v.red = 105;
+          v.green = 179;
+          v.blue = 108;
+        break;
+      }
+    });
   }
 
   parseState(response: WSMessage) {

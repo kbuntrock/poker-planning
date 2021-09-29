@@ -8,7 +8,7 @@
 </div>
 <div class="row" *ngIf="inputMode==='CARD'">
 
-    <div *ngFor="let card of cards" class="card"><app-card [numero]="card.numero" [selected]="card.selected" [voted]="card.numero === myVote"
+    <div *ngFor="let card of cards" class="card"><app-card [numero]="card.numero" [color]="card.color" [selected]="card.selected" [voted]="card.numero === myVote"
          (selectedNumber)="selectCard($event)"></app-card></div>
 
 </div>

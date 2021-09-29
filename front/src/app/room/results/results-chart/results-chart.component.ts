@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { User } from '../../../../shared/websocket.service';
+import { VoteValue } from '../../../model/vote-value';
 
 @Component({
   selector: 'app-results-chart',
@@ -17,13 +18,15 @@ export class ResultsChartComponent implements OnInit {
    * Toutes les valeurs de vote qui sont possibles
    */
   @Input()
-  voteValues: Array<number>;
+  voteValues: Array<VoteValue>;
 
   /**
    * Défini la valeur max en y. Si non défini, sera le plus grand nombre de votes
    */
   @Input()
   maxAxisY: number;
+
+  zoom: boolean = true;
 
   public barChartOptions: ChartOptions = {
     responsive: true,
@@ -56,12 +59,12 @@ export class ResultsChartComponent implements OnInit {
   public barChartData: ChartDataSets[] = [
     { data: [],
       label: 'Nombre de voix',
-      backgroundColor: 'rgba(67, 160, 71, 0.8)',
-      hoverBackgroundColor: 'rgba(67, 160, 71, 0.8)',
-      hoverBorderColor: 'rgba(67, 160, 71, 0.8)',
+      backgroundColor: [],
+      hoverBackgroundColor: [],
+      hoverBorderColor: [],
       borderWidth: 5,
       hoverBorderWidth: 5,
-      borderColor: 'rgba(67, 160, 71, 1)' }
+      borderColor: [] }
   ];
 
   constructor() { }
@@ -76,23 +79,31 @@ export class ResultsChartComponent implements OnInit {
     const label: Array<string[]> = [];
     const data: Array<number> = [];
 
-    this.voteValues.forEach((v, k, m) => {
-      data.push(0);
-      label.push([''+v]);
+    let nbVoteValues: number = 0;
+
+    this.voteValues.forEach((voteValue) => {
+      if (this.zoom && nbVoteValues >= this.votesMap.size) return;
+
+      let votes: Array<User> = this.votesMap.get(voteValue.value);
+      let curLabel: string[] = [''+voteValue.value];
+
+      if (votes) {
+        nbVoteValues++;
+        votes.forEach((vote, i, a) => {
+          curLabel.push(vote.displayName);
+        });
+      } else {
+        if (this.zoom && nbVoteValues === 0 ) return;
+      }
+
+      data.push(votes ? votes.length : 0);
+      label.push(curLabel);
+
+      (<String[]> this.barChartData[0].backgroundColor).push(voteValue.getColor());
     });
 
-    this.votesMap.forEach((value, key, map) => {
-      
-      const index = this.voteValues.findIndex(v => v === key);
-      const l = label[index];
-      value.forEach((v, i, a) => {
-        l.push(v.displayName);
-      });
-      data[index] = value.length;
-    });
     this.barChartLabels = label;
     this.barChartData[0].data = data;
-
   }
 
 }

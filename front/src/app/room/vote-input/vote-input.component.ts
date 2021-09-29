@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { VoteValue } from '../../model/vote-value';
 
 export interface Card {
   numero: number;
+  color: string;
   selected: boolean;
 }
 
@@ -22,7 +24,7 @@ export class VoteInputComponent implements OnInit {
   myVote: number;
 
   @Input()
-  voteValues: Array<number>;
+  voteValues: Array<VoteValue>;
 
   cards: Array<Card>;
 
@@ -33,7 +35,7 @@ export class VoteInputComponent implements OnInit {
   ngOnChanges(): void {
     if (this.voteValues) {
       this.cards = [];
-      this.voteValues.forEach(e => this.cards.push({numero: e, selected: false}));
+      this.voteValues.forEach(e => this.cards.push({numero: e.value, color: e.getColor(), selected: false}));
     }
   }
 

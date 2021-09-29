@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { User } from '../../../../shared/websocket.service';
+import { VoteValue } from '../../../model/vote-value';
 
 @Component({
   selector: 'app-results-board',
@@ -15,7 +16,7 @@ export class ResultsBoardComponent implements OnInit {
    * Toutes les valeurs de vote qui sont possibles
    */
   @Input()
-  voteValues: Array<number>;
+  voteValues: Array<VoteValue>;
 
   minimumValue: number;
   minimumValueVoters: string;
