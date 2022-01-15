@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": ["sockjs-client", "uuid", "chart.js"],
             "outputPath": "dist/poker-planning",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -109,18 +110,6 @@
             "exclude": [
               "**/node_modules/**"
             ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "poker-planning:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "poker-planning:serve:production"
-            }
           }
         }
       }

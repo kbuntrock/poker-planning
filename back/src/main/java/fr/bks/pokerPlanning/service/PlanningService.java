@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -33,6 +34,7 @@ public class PlanningService {
     private SecurityService securityService;
 
     @Autowired
+    @Lazy
     private SimpMessageSendingOperations messagingTemplate;
 
     // Map UUID session / planning
@@ -63,17 +65,16 @@ public class PlanningService {
 
 
     public void register(UUID planningUuid) {
-        securityService.checkNotAnonymous();
 
         WebSocketPrincipal principal = securityService.getPrincipal();
 
         PlanningSession session = getSession(planningUuid);
         String wsId = principal.getWsId();
 
-        User user = session.getState().getConnectedUsers().get(principal.getName());
+        User user = session.getUsers().get(principal.getName());
         if (user == null) {
             user = new User(principal, session);
-            session.getState().getConnectedUsers().put(principal.getName(), user);
+            session.getUsers().put(principal.getName(), user);
         } else {
             // security check, first to register fixes the secret key
             if (!user.getSecretKey().equals(principal.getSecretKey())) {
@@ -93,7 +94,7 @@ public class PlanningService {
         session.updateActivity();
     }
 
-    public void disconnectUser(String wsId) {
+    public void disconnectUser() {
         User user = securityService.getUser();
         if (user != null) {
             securityService.unregisterUser(user);
@@ -196,7 +197,7 @@ public class PlanningService {
 
         if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {
             output.setAdminList(session.getAdminList());
-            output.setConnectedUsers(new ArrayList<>(session.getState().getConnectedUsers().values()));
+            output.setConnectedUsers(new ArrayList<>(session.getUsers().values()));
             output.setStoryLabel(session.getState().getStoryLabel());
         }
 

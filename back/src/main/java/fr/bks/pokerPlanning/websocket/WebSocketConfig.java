@@ -2,40 +2,34 @@ package fr.bks.pokerPlanning.websocket;
 
 import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.service.SecurityService;
-import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.WebSocketAnnotationMethodMessageHandler;
-import org.springframework.web.socket.server.HandshakeInterceptor;
-import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    public static String TOPIC_PLANNING_PREFIX = "/topic/planning/**";
+    public static String USER_TOPIC_PLANNING_PREFIX = "/user" + TOPIC_PLANNING_PREFIX;
+    public static String USER_TOPIC_ERROR_PREFIX = "/user/topic/error";
+    public static String APP_DESTINATION_PREFIX = "/app";
 
     private static final String USER_ID_COOKIE_NAME = "userId";
     private static final String USERKEY_COOKIE_NAME = "userKey";
@@ -50,8 +44,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        //config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes(APP_DESTINATION_PREFIX);
     }
 
     @Override
@@ -60,40 +54,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .addEndpoint("/api/websocket")
                 .setAllowedOrigins("http://localhost:4200") // Autorisation des CORS pour le devmode
                 .withSockJS()
-                .setInterceptors(httpSessionHandshakeInterceptor())
                 //.setWebSocketEnabled(false)
         ;
     }
 
-    @Bean
-    public HandshakeInterceptor httpSessionHandshakeInterceptor() {
-        return new HandshakeInterceptor() {
-            @Override
-            public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-                if (request instanceof ServletServerHttpRequest) {
-                    HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
-
-                    forwardValue(USER_ID_COOKIE_NAME, servletRequest, attributes);
-                    forwardValue(USERKEY_COOKIE_NAME, servletRequest, attributes);
-                    forwardValue(USERNAME_COOKIE_NAME, servletRequest, attributes);
-                }
-                return true;
-            }
-
-            @Override
-            public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-            }
-        };
-    }
-
-    private void forwardValue(String paramName, HttpServletRequest servletRequest, Map<String, Object> attributes) {
-        Cookie token = WebUtils.getCookie(servletRequest, paramName);
-        if (token != null) {
-            attributes.put(paramName, token.getValue());
-        }
-    }
-
-
+    /**
+     * https://stackoverflow.com/questions/45405332/websocket-authentication-and-authorization-in-spring
+     * @param registration
+     */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ExecutorChannelInterceptor() {
@@ -101,25 +69,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-                switch (accessor.getCommand()) {
-                    case CONNECT:
-                        Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-                        String userId = (String) sessionAttributes.get(USER_ID_COOKIE_NAME);
-                        String userKey = (String) sessionAttributes.get(USERKEY_COOKIE_NAME);
-                        String encodedUserName = (String) sessionAttributes.get(USERNAME_COOKIE_NAME);
+                if(accessor != null && accessor.getCommand() != null) {
+                    StompCommand command = accessor.getCommand();
+                    if(StompCommand.CONNECT == command) {
+                        String userId = accessor.getFirstNativeHeader(USER_ID_COOKIE_NAME);
+                        String userKey = accessor.getFirstNativeHeader(USERKEY_COOKIE_NAME);
+                        String encodedUserName = accessor.getFirstNativeHeader(USERNAME_COOKIE_NAME);
                         String userName = URLDecoder.decode(encodedUserName, StandardCharsets.UTF_8);
 
                         WebSocketPrincipal principal = new WebSocketPrincipal(userId, userName, userKey, accessor.getSessionId());
-                        accessor.setUser(principal);
-
-                        break;
-                    case DISCONNECT:
-                        securityService.registerPrincipal((WebSocketPrincipal) accessor.getUser());
-                        planningService.disconnectUser(accessor.getSessionId());
-                        break;
-                    default:
-                        // nothing
+                        accessor.setUser(new WebsocketAuthent(principal));
+                    } else if(StompCommand.DISCONNECT == command){
+                        securityService.registerPrincipal(WebSocketPrincipal.getFromHeader(accessor));
+                        planningService.disconnectUser();
+                    }
                 }
+
 
                 return message;
             }
@@ -128,12 +93,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
                 if (handler instanceof WebSocketAnnotationMethodMessageHandler) {
                     StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                    switch (accessor.getCommand()) {
-                        case SEND:
-                            securityService.registerPrincipal((WebSocketPrincipal) accessor.getUser());
-                            break;
-                        default:
-                            // nothing
+                    if(accessor.getCommand() != null && StompCommand.SEND == accessor.getCommand()) {
+                        securityService.registerPrincipal((WebSocketPrincipal) ((WebsocketAuthent) accessor.getUser()).getPrincipal());
                     }
                 }
 
@@ -144,12 +105,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public void afterMessageHandled(Message<?> message, MessageChannel channel, MessageHandler handler, Exception ex) {
                 if (handler instanceof WebSocketAnnotationMethodMessageHandler) {
                     StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                    switch (accessor.getCommand()) {
-                        case SEND:
-                            securityService.unRegisterPrincipal((WebSocketPrincipal) accessor.getUser());
-                            break;
-                        default:
-                            // nothing
+                    if(accessor.getCommand() != null && StompCommand.SEND == accessor.getCommand()) {
+                            securityService.unRegisterPrincipal((WebSocketPrincipal) ((WebsocketAuthent) accessor.getUser()).getPrincipal());
                     }
                 }
             }

@@ -48,11 +48,15 @@ export class WebsocketService {
     // Important : Il faut passer une fonction capable de renvoyer une nouvelle instance du websocket sous peine de ne pas avoir la reconnection automatique
     // (et de ne pas pouvoir alterner les activate/deactivate)
     this.client = Stomp.over(() => new SockJS(url, null, {transports:['websocket','eventsource','xhr-polling']}));
+    this.client.connectHeaders = {
+      'userId': appProperties.getUserId(),
+      'username': appProperties.getUsername()
+    };
 
     this.client.onConnect = this.onConnect;
     this.client.onDisconnect = this.onDisconnect;
 
-    this.client.reconnectDelay = 500;
+    this.client.reconnectDelay = 5000;
     this.client.heartbeatIncoming = 20000;
     this.client.heartbeatOutgoing = 20000;
   }
