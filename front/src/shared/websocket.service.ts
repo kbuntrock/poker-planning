@@ -48,10 +48,6 @@ export class WebsocketService {
     // Important : Il faut passer une fonction capable de renvoyer une nouvelle instance du websocket sous peine de ne pas avoir la reconnection automatique
     // (et de ne pas pouvoir alterner les activate/deactivate)
     this.client = Stomp.over(() => new SockJS(url, null, {transports:['websocket','eventsource','xhr-polling']}));
-    this.client.connectHeaders = {
-      'userId': appProperties.getUserId(),
-      'username': appProperties.getUsername()
-    };
 
     this.client.onConnect = this.onConnect;
     this.client.onDisconnect = this.onDisconnect;
@@ -70,6 +66,11 @@ export class WebsocketService {
   }
 
   connect() {
+    this.client.connectHeaders = {
+      'userId': this.appProperties.getUserId(),
+      'username': this.appProperties.getUsername()
+    };
+
     console.info("Connexion ...")
     this.state.next(SocketClientState.ATTEMPTING_CONNECTION);
     this.client.activate();
