@@ -3,7 +3,16 @@
         Créez un sprint planning
     </mat-card-title>
     <mat-card-content>
-        <form (ngSubmit)="createRoom()">
+        <form [formGroup]="spForm" (ngSubmit)="createRoom()">
+            <mat-form-field appearance="outline" class="full-width">
+                <input required maxlength=35 formControlName="roomName" matInput placeholder="Nom du sprint planning">
+                <mat-error *ngIf="spForm.controls.roomName.errors?.required">
+                  <span>Champs requis</span>
+                </mat-error>
+                <mat-error *ngIf="spForm.controls.roomName.errors?.maxlength">
+                  <span>Trop de caractères (35 max)</span>
+                </mat-error>
+              </mat-form-field>
             <button mat-raised-button color="accent">Créer</button>
         </form>
           

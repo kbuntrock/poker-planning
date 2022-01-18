@@ -44,7 +44,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   subscription: Subscription = new Subscription();
 
   constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService,
-    private clipboard: Clipboard, private readonly appProperties: PropertiesService,
+    private readonly appProperties: PropertiesService,
     private readonly ngZone: NgZone,
     private readonly platformLocation: PlatformLocation)  { }
 
@@ -100,6 +100,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.voteValues = [];
     response.voteValues.forEach(v => {
       this.voteValues.push(new VoteValue(v));
+    });
+    this.appProperties.getRoomInfos$().next(
+    {
+      name: response.roomName,
+      url: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'room/' + this.roomId
     });
     this.computeVoteValuesColors();
     this.parseState(response);
@@ -195,13 +200,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     return users;
   }
-
-  copyToClipboard() {
-    let url = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'room/' + this.roomId;
-    console.info('copy url : '+url);
-    this.clipboard.copy(url);
-  }
-
+  
   changerUS(libelleUS: string) {
     this.storyLabel = libelleUS;
     this.wsService.startNewStory(this.storyLabel);

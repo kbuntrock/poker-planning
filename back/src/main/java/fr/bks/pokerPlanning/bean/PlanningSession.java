@@ -11,6 +11,9 @@ public class PlanningSession {
 
     private final UUID planningUuid = UUID.randomUUID();
 
+    // Le nom de cette session
+    private String name;
+
     private final Map<String, User> connectedUsers = new ConcurrentHashMap<>();
     private Set<String> adminList = new HashSet<>();
 
@@ -54,5 +57,13 @@ public class PlanningSession {
 
     public Map<String, User> getUsers() {
         return connectedUsers;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -48,6 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .csrf(csrf -> csrf
                         .ignoringAntMatchers("/api/websocket/**")
+                        .ignoringAntMatchers("/api/planning/create")
                 ).cors();
 
 

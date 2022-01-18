@@ -54,8 +54,9 @@ public class PlanningService {
         return planningSession;
     }
 
-    public PlanningSession createSession(final String userId) {
+    public PlanningSession createSession(final String userId, final String name) {
         PlanningSession newSession = new PlanningSession();
+        newSession.setName(name);
         newSession.getAdminList().add(userId);
 
         sessions.put(newSession.getPlanningUuid(), newSession);
@@ -193,6 +194,7 @@ public class PlanningService {
         if (MessageType.FULL.equals(type)) {
             output.setStories(session.getStories());
             output.setVoteValues(session.getVoteValues());
+            output.setRoomName(session.getName());
         }
 
         if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {

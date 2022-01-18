@@ -26,7 +26,8 @@ export interface WSMessage {
   storyLabel: string,
   voted: Array<string>,
   myVote: number,
-  votes: Array<string>
+  votes: Array<string>,
+  roomName: string
 }
 
 @Injectable({
