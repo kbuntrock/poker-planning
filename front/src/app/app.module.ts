@@ -27,6 +27,7 @@ import { CardComponent } from './room/card/card.component';
 import { ChartsModule } from 'ng2-charts';
 import { ResultsChartComponent } from './room/results/results-chart/results-chart.component';
 import { ResultsBoardComponent } from './room/results/results-board/results-board.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar'; 
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { ResultsBoardComponent } from './room/results/results-board/results-boar
     MatMenuModule,
     HttpClientModule,
     MatListModule,
+    MatSnackBarModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],
