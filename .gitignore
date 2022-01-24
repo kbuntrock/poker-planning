@@ -1,3 +1,7 @@
 .idea/
 back/target/
 /back/back.iml
+
+/front/.angulardoc.json
+/front/.vscode/
+/front/.angular/cache

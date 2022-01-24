@@ -3,6 +3,15 @@ import { CookieService } from 'ngx-cookie-service';
 import * as uuid from 'uuid';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 
+/**
+ * Utilisé pour passer des informations sur la session en cours à des élements de haut niveau
+ * (header de l'application)
+ */
+export class RoomInfo {
+  name: string;
+  url: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,6 +25,8 @@ export class PropertiesService {
   private userId: string;
   private userKey: string;
   private username$ = new BehaviorSubject<string>(undefined);
+
+  private roomInfos$ = new BehaviorSubject<RoomInfo>(undefined);
 
   constructor(private cookieService: CookieService) {
     if (this.cookieService.check(PropertiesService.USER_ID_COOKIE_NAME)) {
@@ -81,5 +92,9 @@ export class PropertiesService {
         this.cookieService.set(PropertiesService.USERNAME_COOKIE_NAME, this.username$.getValue(), PropertiesService.COOKIE_MAX_AGE, '/');
       }
      
+  }
+
+  public getRoomInfos$(): BehaviorSubject<RoomInfo> {
+    return this.roomInfos$;
   }
 }

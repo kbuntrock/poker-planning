@@ -26,7 +26,8 @@ export interface WSMessage {
   storyLabel: string,
   voted: Array<string>,
   myVote: number,
-  votes: Array<string>
+  votes: Array<string>,
+  roomName: string
 }
 
 @Injectable({
@@ -52,7 +53,7 @@ export class WebsocketService {
     this.client.onConnect = this.onConnect;
     this.client.onDisconnect = this.onDisconnect;
 
-    this.client.reconnectDelay = 500;
+    this.client.reconnectDelay = 5000;
     this.client.heartbeatIncoming = 20000;
     this.client.heartbeatOutgoing = 20000;
   }
@@ -66,6 +67,11 @@ export class WebsocketService {
   }
 
   connect() {
+    this.client.connectHeaders = {
+      'userId': this.appProperties.getUserId(),
+      'username': this.appProperties.getUsername()
+    };
+
     console.info("Connexion ...")
     this.state.next(SocketClientState.ATTEMPTING_CONNECTION);
     this.client.activate();

@@ -17,6 +17,7 @@ public class PlanningOutputMessage {
     private Set<String> voted;
     private Integer myVote;
     private Map<String, Integer> votes;
+    private String roomName;
 
     public String getType() {
         return type;
@@ -88,5 +89,13 @@ public class PlanningOutputMessage {
 
     public void setAdminList(Set<String> adminList) {
         this.adminList = adminList;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 }

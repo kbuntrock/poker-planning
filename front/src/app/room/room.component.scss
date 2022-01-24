@@ -35,8 +35,8 @@
 .direct-link {
   display: flex;
   align-content: center;
-  margin-left: 30px;
   align-items: center;
+  width: 30%;
 }
 
 .user {
@@ -52,10 +52,30 @@
   margin-left: 40px;
 }
 
-.story-card {
-  width: 100%;
+.results {
+  flex-grow: 1;
 }
 
-.results {
-  margin-top: 10vh;
+.card-panel {
+  flex-grow: 1;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.story-title {
+  margin: auto 0px;
+  width: 30%;
+}
+
+.control-panel {
+  height: 64px;
+  background: #43565f; //#43a047;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  padding-left: 5%;
+  padding-right: 5%;
 }

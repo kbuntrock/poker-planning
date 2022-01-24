@@ -7,6 +7,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { PropertiesService } from '../common/properties.service';
 import { environment } from '../../environments/environment';
 import { VoteValue } from '../model/vote-value';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 enum ColorScheme {
   Green = "Green",
@@ -31,6 +32,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   isScrumMaster: boolean = false;
   creatingNewRoom: boolean = false;
   voteInProgress: boolean = false;
+  atLeastOnePersonVoted: boolean = false;
   myVote: number;
 
   users: Array<User>;
@@ -44,9 +46,10 @@ export class RoomComponent implements OnInit, OnDestroy {
   subscription: Subscription = new Subscription();
 
   constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService,
-    private clipboard: Clipboard, private readonly appProperties: PropertiesService,
+    private readonly appProperties: PropertiesService,
     private readonly ngZone: NgZone,
-    private readonly platformLocation: PlatformLocation)  { }
+    private readonly platformLocation: PlatformLocation,
+    private snackBar: MatSnackBar)  { }
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
@@ -101,6 +104,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     response.voteValues.forEach(v => {
       this.voteValues.push(new VoteValue(v));
     });
+    this.appProperties.getRoomInfos$().next(
+    {
+      name: response.roomName,
+      url: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'room/' + this.roomId
+    });
     this.computeVoteValuesColors();
     this.parseState(response);
   }
@@ -142,11 +150,15 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   parseVoted(voted: Array<string>) {
+    this.atLeastOnePersonVoted = false;
     let aVote = false;
     for (const element of this.usersMap.values()) {
       element.voted = false;
     }
     if(voted) {
+      if(voted.length > 0) {
+        this.atLeastOnePersonVoted = true;
+      }
       voted.forEach(v => {
         if(this.appProperties.getUserId() === v){
           aVote = true;
@@ -196,12 +208,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     return users;
   }
 
-  copyToClipboard() {
-    let url = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'room/' + this.roomId;
-    console.info('copy url : '+url);
-    this.clipboard.copy(url);
-  }
-
   changerUS(libelleUS: string) {
     this.storyLabel = libelleUS;
     this.wsService.startNewStory(this.storyLabel);
@@ -213,7 +219,11 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   revelerVotes() {
-    this.wsService.revelerVotes();
+    if(this.atLeastOnePersonVoted){
+      this.wsService.revelerVotes();
+    } else {
+      this.snackBar.open("Il n'y a encore aucun vote à révéler!", undefined, { duration: 1500 });
+    }
   }
 
 }

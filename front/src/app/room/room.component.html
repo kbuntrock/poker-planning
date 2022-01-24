@@ -10,22 +10,12 @@
     </mat-list>
 </div>
 <div class="main-panel">
-    <div class="title">
-        <h1 class="margin-header tc">Sprint Planning</h1>
-        <div class="direct-link"><button (click)="copyToClipboard()" mat-raised-button color="accent">Copy direct link</button></div>
+    <div class="control-panel">
+        <h1 class="story-title">Story : {{ storyLabel }}</h1>
+        <div *ngIf="isScrumMaster" class="direct-link"><button *ngIf="voteInProgress" (click)="revelerVotes()" mat-raised-button color="accent">Révéler les votes</button></div>
+        <app-story-creator *ngIf="isScrumMaster" [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
     </div>
-    <!-- <h3 class="tc">id :  {{ roomId }}</h3> -->
-    <div *ngIf="!isScrumMaster">
-        <h1 class="margin-header tc">Story : {{ storyLabel }}</h1>
-    </div>
-    <div *ngIf="isScrumMaster && !voteInProgress">
-        <app-story-creator [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
-    </div>
-    <div *ngIf="isScrumMaster && voteInProgress">
-        <div class="direct-link"><button (click)="revelerVotes()" mat-raised-button color="accent">Révéler</button></div>
-    </div>
-    <app-vote-input [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" *ngIf="voteInProgress" (voteEvent)="voter($event)"></app-vote-input>
-    <div *ngIf="votesMap.size !== 0">
-        <app-results-board class="results" [votesMap]="votesMap" [voteValues]="voteValues"></app-results-board>
-    </div>
+    <app-vote-input *ngIf="voteInProgress" class="card-panel" [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" (voteEvent)="voter($event)"></app-vote-input>
+    <app-results-board *ngIf="votesMap.size !== 0" class="results" [votesMap]="votesMap" [voteValues]="voteValues"></app-results-board>
+
 </div>

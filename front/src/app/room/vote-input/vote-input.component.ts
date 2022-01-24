@@ -51,9 +51,10 @@ export class VoteInputComponent implements OnInit {
         c.selected = false;
       }
     });
-    //this.voter(numero.toString());
+    this.voteEvent.emit(numero);
   }
 
+  /*
   voterCard() {
     let vote = undefined;
     this.cards.forEach(c => {
@@ -65,6 +66,6 @@ export class VoteInputComponent implements OnInit {
       this.voteEvent.emit(vote);
     }
 
-  }
+  }*/
 
 }

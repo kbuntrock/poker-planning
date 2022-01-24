@@ -4,11 +4,13 @@ import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.bean.PlanningVoteMessage;
 import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.service.SecurityService;
+import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -36,9 +38,10 @@ public class PlanningController {
     }
 
     @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true") // Autorise le CORS pour le devmode
-    @GetMapping("/planning/create")
-    public PlanningSession createPlanning(@CookieValue(value = "userId", required = true) String userId) {
-        return planningService.createSession(userId);
+    @PostMapping("/planning/create")
+    public PlanningSession createPlanning(@CookieValue(value = "userId", required = true) String userId,
+         @RequestBody final String roomName) {
+        return planningService.createSession(userId, roomName);
     }
 
 

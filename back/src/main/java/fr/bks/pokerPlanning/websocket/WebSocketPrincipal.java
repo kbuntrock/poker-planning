@@ -1,5 +1,7 @@
 package fr.bks.pokerPlanning.websocket;
 
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+
 import java.security.Principal;
 
 public class WebSocketPrincipal implements Principal {
@@ -36,6 +38,10 @@ public class WebSocketPrincipal implements Principal {
 
     public String getWsId() {
         return wsId;
+    }
+
+    public static WebSocketPrincipal getFromHeader(StompHeaderAccessor accessor){
+        return (WebSocketPrincipal) ((WebsocketAuthent) accessor.getUser()).getPrincipal();
     }
 
 }

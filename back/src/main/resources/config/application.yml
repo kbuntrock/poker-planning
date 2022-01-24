@@ -1,4 +1,17 @@
+application:
+  title: Poker-Planning
+  version: 0.1-SNAPSHOT
+
 planner:
   .planning:
     .max-age-hour: 24
     .clean-frequency-second: 3600 # 1 hour
+
+corsAllowedUrls: localhost:4200
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+      # pas de path_pattern_parser car paraît difficile de configurer l'AngularController pour matcher
+      # avec /app/join-room/xxx par exemple mais pas avec les ressources /app/**/*.*
