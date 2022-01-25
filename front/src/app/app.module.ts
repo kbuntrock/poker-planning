@@ -28,6 +28,7 @@ import { ChartsModule } from 'ng2-charts';
 import { ResultsChartComponent } from './room/results/results-chart/results-chart.component';
 import { ResultsBoardComponent } from './room/results/results-board/results-board.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar'; 
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatMenuModule,
     HttpClientModule,
     MatListModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

@@ -79,3 +79,22 @@
   padding-left: 5%;
   padding-right: 5%;
 }
+
+.panel-attente-us {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  padding-left: 30%;
+  padding-right: 30%;
+  padding-top: 15%;
+}
+
+.panel-first-us {
+  padding-left: 30%;
+  padding-right: 30%;
+  padding-top: 15%;
+}
+
+.centered-spinner {
+  margin-top: 2vh;
+}

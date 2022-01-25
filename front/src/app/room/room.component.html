@@ -10,12 +10,48 @@
     </mat-list>
 </div>
 <div class="main-panel">
-    <div class="control-panel">
-        <h1 class="story-title">Story : {{ storyLabel }}</h1>
-        <div *ngIf="isScrumMaster" class="direct-link"><button *ngIf="voteInProgress" (click)="revelerVotes()" mat-raised-button color="accent">Révéler les votes</button></div>
-        <app-story-creator *ngIf="isScrumMaster" [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
+    <div *ngIf="!fullMessageReceived" class="panel-attente-us">
+        <h2 class="fas-centered">Connexion à la session en cours</h2>
+        <mat-spinner class="centered-spinner fas-centered"></mat-spinner>
     </div>
-    <app-vote-input *ngIf="voteInProgress" class="card-panel" [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" (voteEvent)="voter($event)"></app-vote-input>
-    <app-results-board *ngIf="votesMap.size !== 0" class="results" [votesMap]="votesMap" [voteValues]="voteValues"></app-results-board>
+    <ng-container *ngIf="fullMessageReceived" >
+        <!-- Tant que la première story n'a pas été choisie -->
+        <ng-container *ngIf="storyLabel === undefined">
+            <!-- Création de la première story pour le scrum master  -->
+            <div *ngIf="isScrumMaster" class="panel-first-us">
+                <mat-card >
+                    <mat-card-title>
+                        Configurez votre première US
+                    </mat-card-title>
+                    <mat-card-content>
+                        <form [formGroup]="usForm" (ngSubmit)="changerPremiereUS()">
+                            <mat-form-field appearance="outline" class="full-width">
+                                <input required maxlength=35 formControlName="usName" matInput placeholder="Nom de l'US">
+                                <mat-error *ngIf="usForm.controls.usName.errors?.required">
+                                <span>Champs requis</span>
+                                </mat-error>
+                                <mat-error *ngIf="usForm.controls.usName.errors?.maxlength">
+                                <span>Trop de caractères (35 max)</span>
+                                </mat-error>
+                            </mat-form-field>
+                            <button mat-raised-button color="accent">Passer au vote</button>
+                        </form>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div *ngIf="!isScrumMaster" class="panel-attente-us">
+                <h2 class="fas-centered">En attente d'une première US</h2>
+                <mat-spinner class="fas-centered"></mat-spinner>
+            </div>
 
+        </ng-container>
+        <!-- Lorsque la première US a été choisie -->
+        <div *ngIf="storyLabel !== undefined" class="control-panel">
+            <h1 class="story-title">Story : {{ storyLabel }}</h1>
+            <div *ngIf="isScrumMaster" class="direct-link"><button *ngIf="voteInProgress" (click)="revelerVotes()" mat-raised-button color="accent">Révéler les votes</button></div>
+            <app-story-creator *ngIf="isScrumMaster" [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
+        </div>
+        <app-vote-input *ngIf="voteInProgress" class="card-panel" [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" (voteEvent)="voter($event)"></app-vote-input>
+        <app-results-board *ngIf="votesMap.size !== 0" class="results" [votesMap]="votesMap" [voteValues]="voteValues"></app-results-board>
+    </ng-container>
 </div>
