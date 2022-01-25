@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -167,6 +169,35 @@ public class PlanningService {
         sessionState.setVoteInProgress(false);
 
         sendToPlanning(session, MessageType.FULL);
+    }
+
+    public void promoteUser(final UUID planningUuid, final String userIdToPromote) {
+        securityService.checkNotAnonymous()
+                .checkBelongToPlanning(planningUuid)
+                .checkIfAdmin();
+
+        PlanningSession session = getSession(planningUuid);
+
+        if(session.getUsers().containsKey(userIdToPromote)){
+            session.getAdminList().add(userIdToPromote);
+            sendToPlanning(session, MessageType.STATE);
+        }
+
+    }
+
+    public void demoteUser(final UUID planningUuid, final String userIdToDemote) {
+        securityService.checkNotAnonymous()
+                .checkBelongToPlanning(planningUuid)
+                .checkIfAdmin();
+
+        PlanningSession session = getSession(planningUuid);
+
+        // On ne peut ni s'enlever soit-même la permission d'admin, ni enlever le dernier administrateur
+        if(session.getAdminList().size() > 1 && session.getAdminList().contains(userIdToDemote) && !securityService.getUser().getName().equals(userIdToDemote)){
+            session.getAdminList().remove(userIdToDemote);
+            sendToPlanning(session, MessageType.STATE);
+        }
+
     }
 
     private void sendToPlanning(PlanningSession session, MessageType type) {

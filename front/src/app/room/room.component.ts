@@ -25,6 +25,8 @@ enum ColorScheme {
 })
 export class RoomComponent implements OnInit, OnDestroy {
 
+  myUserName: string;
+
   // Indique si on a reçu les informations de la room en cours
   fullMessageReceived: boolean = false;
 
@@ -67,6 +69,8 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
+    this.myUserName = this.appProperties.getUserId();
+
     if(this.wsService.getClientState() !== SocketClientState.CONNECTED){
       // La connexion est en cours, on rejoindra la room quand elle sera effective
       this.subscription.add(this.wsService.getClientState$().subscribe(state => {
@@ -247,6 +251,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     } else {
       this.snackBar.open("Il n'y a encore aucun vote à révéler!", undefined, { duration: 1500 });
     }
+  }
+
+  promoteUser(userId: string){
+    this.wsService.promoteUser(userId);
+  }
+
+  demoteUser(userId: string){
+    this.wsService.demoteUser(userId);
   }
 
 }

@@ -1,9 +1,10 @@
 <mat-toolbar color="primary">
     <span>Poker Planning</span>
     <span class="spacer"></span>
-    <span *ngIf="roomInfos !== undefined">{{ roomInfos.name }}</span>
+    <span class="room-title" *ngIf="roomInfos !== undefined">{{ roomInfos.name }}</span>
     <button (click)="copyToClipboard()" mat-icon-button *ngIf="roomInfos !== undefined"><mat-icon>content_copy</mat-icon></button>
     <span class="spacer"></span>
+    <mat-icon [ngClass]="wsConnected ? 'color-connected' : 'color-disconnected'" class="connectivity-icon"  matTooltip="Indicateur de connectivité">network_check</mat-icon>
     <button *ngIf="showMenu" mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>menu</mat-icon>
     </button>

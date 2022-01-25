@@ -1,3 +1,19 @@
 :host {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+
+.connectivity-icon {
+  margin-right: 2vw;
+}
+
+.color-connected {
+  color: rgb(0, 206, 0);
+}
+
+.color-disconnected {
+  color: rgb(255, 34, 34);
+}
+
+.room-title {
+  margin-left: 5vw;
+}

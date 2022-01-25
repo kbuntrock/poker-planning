@@ -15,7 +15,7 @@ public class PlanningSession {
     private String name;
 
     private final Map<String, User> connectedUsers = new ConcurrentHashMap<>();
-    private Set<String> adminList = new HashSet<>();
+    private Set<String> adminList = ConcurrentHashMap.newKeySet();
 
     private final State state = new State();
     private final List<Story> stories = new ArrayList<>();

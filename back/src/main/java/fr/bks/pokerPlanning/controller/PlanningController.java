@@ -44,7 +44,6 @@ public class PlanningController {
         return planningService.createSession(userId, roomName);
     }
 
-
     @MessageMapping("/planning/{planningUuid}/register")
     public void register(@DestinationVariable UUID planningUuid) {
         planningService.register(planningUuid);
@@ -57,55 +56,25 @@ public class PlanningController {
         planningService.vote(planningUuid, inputMessage.getValue());
     }
 
-    // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/newStory")
-    // public void newStory(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal, String label) {
     @MessageMapping("/planning/{planningUuid}/newStory")
     public void newStory(@DestinationVariable UUID planningUuid, String label) {
         planningService.newStory(planningUuid, label);
     }
 
-    // @MessageMapping("/planning/{planningUuid}/admin/{planningAdminKey}/reveal")
-    // public void reveal(@DestinationVariable UUID planningUuid, @DestinationVariable UUID planningAdminKey, WebSocketPrincipal principal) {
     @MessageMapping("/planning/{planningUuid}/reveal")
     public void reveal(@DestinationVariable UUID planningUuid) {
         planningService.reveal(planningUuid);
     }
 
-
-      /*
-    @MessageMapping("/planning/{planningUuid}")
-    public void planningMessageHandler(Message message, PlanningInputMessage businessMessage, @DestinationVariable Long planningUuid) throws Exception {
-
-        messagingTemplate.convertAndSend("/topic/greetings", new Greeting("Message a tout le monde"));
-        messagingTemplate.convertAndSendToUser(principal.getName(), "/topic/greetings", new Greeting("Message a tous les " + principal.getName()));
-
-        String sessionId = message.getHeaders().get(SimpMessageHeaderAccessor.SESSION_ID_HEADER, String.class);
-
-        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor
-                .create(SimpMessageType.MESSAGE);
-        headerAccessor.setSessionId(sessionId);
-        headerAccessor.setLeaveMutable(true);
-
-        messagingTemplate.convertAndSendToUser(principal.getName(), "/topic/greetings", new Greeting("Message juste a l'envoyeur."), headerAccessor.getMessageHeaders());
-
-
-        sendToSession(message, "/topic/planning/" + planningUuid, new PlanningOutputMessage("Message juste a l'envoyeur."));
-
-        messagingTemplate.convertAndSend("/topic/planning/" + planningUuid, new PlanningOutputMessage("Test"));
+    @MessageMapping("/planning/{planningUuid}/promote-user")
+    public void promoteUser(@DestinationVariable UUID planningUuid, String userIdToPromote) {
+        planningService.promoteUser(planningUuid, userIdToPromote);
     }
-*/
-/*
-    private void sendToSession(Message inputMessage, String topic, PlanningOutputMessage message) {
-        String sessionId = inputMessage.getHeaders().get(SimpMessageHeaderAccessor.SESSION_ID_HEADER, String.class);
-        Principal principal = inputMessage.getHeaders().get(SimpMessageHeaderAccessor.USER_HEADER, Principal.class);
 
-        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor
-                .create(SimpMessageType.MESSAGE);
-        headerAccessor.setSessionId(sessionId);
-        headerAccessor.setLeaveMutable(true);
-
-        messagingTemplate.convertAndSendToUser(principal.getName(), topic, message, headerAccessor.getMessageHeaders());
+    @MessageMapping("/planning/{planningUuid}/demote-user")
+    public void demoteUser(@DestinationVariable UUID planningUuid, String userIdToDemote) {
+        planningService.demoteUser(planningUuid, userIdToDemote);
     }
-*/
+
 
 }

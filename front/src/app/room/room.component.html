@@ -2,10 +2,19 @@
     <h1 class="margin-header tc">Equipe</h1>
     <mat-list>
         <mat-list-item [ngClass]="(!user.connected)?'user-disconnected':'user'" *ngFor="let user of users">
+            
+            <button [ngClass]="!isScrumMaster || myUserName === user.name?'hidden':''" [matMenuTriggerFor]="menuAdmin" class="user-menu-icon" mat-icon-button>
+                <mat-icon >more_horiz</mat-icon>
+            </button>
+            <mat-menu #menuAdmin="matMenu">
+                <button *ngIf="!adminList.includes(user.name)" mat-menu-item (click)="promoteUser(user.name)">Promouvoir administrateur</button>
+                <button *ngIf="adminList.includes(user.name)" mat-menu-item (click)="demoteUser(user.name)">Rétrograder utilisateur</button>
+            </mat-menu>
+
             <mat-icon *ngIf="!adminList.includes(user.name)" class="user-icon">account_circle</mat-icon>
             <mat-icon *ngIf="adminList.includes(user.name)" class="user-icon">assignment_ind</mat-icon>
             {{ user.displayName }}
-            <mat-icon *ngIf="user.voted" class="user-icon">how_to_vote</mat-icon>
+            <mat-icon *ngIf="user.voted" class="voted-icon">how_to_vote</mat-icon>
         </mat-list-item>
     </mat-list>
 </div>

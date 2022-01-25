@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PropertiesService, RoomInfo } from '../properties.service';
 import { Subscription } from 'rxjs';
-import { WebsocketService } from '../../../shared/websocket.service';
+import { SocketClientState, WebsocketService } from '../../../shared/websocket.service';
 import { Router } from '@angular/router';
 import { Clipboard } from '@angular/cdk/clipboard';
 
@@ -17,6 +17,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   public roomInfos: RoomInfo;
 
+  public wsConnected = false;
+
   constructor(private readonly propertiesService: PropertiesService,
     private readonly wsService: WebsocketService,
     private readonly router: Router,
@@ -28,6 +30,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }));
     this.subscriptions.add(this.propertiesService.getRoomInfos$().subscribe(infos => {
       this.roomInfos = infos;
+    }));
+    this.subscriptions.add(this.wsService.getClientState$().subscribe(state => {
+      if(SocketClientState.CONNECTED === state) {
+        this.wsConnected = true;
+      } else if(SocketClientState.DISCONNECTED === state){
+        this.wsConnected = false;
+      }
     }));
   }
 
