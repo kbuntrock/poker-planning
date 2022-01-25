@@ -8,6 +8,7 @@ import { PropertiesService } from '../common/properties.service';
 import { environment } from '../../environments/environment';
 import { VoteValue } from '../model/vote-value';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 enum ColorScheme {
   Green = "Green",
@@ -24,6 +25,11 @@ enum ColorScheme {
 })
 export class RoomComponent implements OnInit, OnDestroy {
 
+  myUserName: string;
+
+  // Indique si on a reçu les informations de la room en cours
+  fullMessageReceived: boolean = false;
+
   roomId: string;
   voteValues: Array<VoteValue>;
   colorScheme: ColorScheme = ColorScheme.GreenToRed;
@@ -38,21 +44,33 @@ export class RoomComponent implements OnInit, OnDestroy {
   users: Array<User>;
   usersMap = new Map<string, User>();
   adminList: Array<string> = undefined;
-  storyLabel: string = "..."
+  storyLabel: string | undefined = undefined
 
   votesMap = new Map<number, Array<User>>();
   votesArray: Array<string> = undefined;
 
   subscription: Subscription = new Subscription();
 
+  public usForm: FormGroup;
+
   constructor(private readonly route: ActivatedRoute, private readonly wsService: WebsocketService,
     private readonly appProperties: PropertiesService,
     private readonly ngZone: NgZone,
     private readonly platformLocation: PlatformLocation,
-    private snackBar: MatSnackBar)  { }
+    private snackBar: MatSnackBar,
+    private readonly formBuilder: FormBuilder)  {
+
+      this.usForm = this.formBuilder.group({
+        usName: ['', [Validators.required, Validators.maxLength(35)]]
+      });
+  }
+
+  
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.params['roomId'];
+    this.myUserName = this.appProperties.getUserId();
+
     if(this.wsService.getClientState() !== SocketClientState.CONNECTED){
       // La connexion est en cours, on rejoindra la room quand elle sera effective
       this.subscription.add(this.wsService.getClientState$().subscribe(state => {
@@ -100,6 +118,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   parseFull(response: WSMessage) {
+    this.fullMessageReceived = true;
+    
     this.voteValues = [];
     response.voteValues.forEach(v => {
       this.voteValues.push(new VoteValue(v));
@@ -208,6 +228,13 @@ export class RoomComponent implements OnInit, OnDestroy {
     return users;
   }
 
+  changerPremiereUS() {
+    if(this.usForm.valid) {
+      this.changerUS(this.usForm.get('usName').value);
+    }
+    
+  }
+
   changerUS(libelleUS: string) {
     this.storyLabel = libelleUS;
     this.wsService.startNewStory(this.storyLabel);
@@ -224,6 +251,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     } else {
       this.snackBar.open("Il n'y a encore aucun vote à révéler!", undefined, { duration: 1500 });
     }
+  }
+
+  promoteUser(userId: string){
+    this.wsService.promoteUser(userId);
+  }
+
+  demoteUser(userId: string){
+    this.wsService.demoteUser(userId);
   }
 
 }

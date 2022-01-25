@@ -49,7 +49,14 @@
 
 .user-icon {
   margin-right: 20px;
-  margin-left: 40px;
+}
+
+.user-menu-icon {
+  margin-right: 10px;
+}
+
+.voted-icon {
+  margin-left: 20px;
 }
 
 .results {
@@ -78,4 +85,23 @@
   align-content: center;
   padding-left: 5%;
   padding-right: 5%;
+}
+
+.panel-attente-us {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  padding-left: 30%;
+  padding-right: 30%;
+  padding-top: 15%;
+}
+
+.panel-first-us {
+  padding-left: 30%;
+  padding-right: 30%;
+  padding-top: 15%;
+}
+
+.centered-spinner {
+  margin-top: 2vh;
 }

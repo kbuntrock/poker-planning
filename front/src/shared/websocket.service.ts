@@ -146,4 +146,18 @@ export class WebsocketService {
     });
 
   }
+
+  promoteUser(userId: string){
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/promote-user',
+      body: userId
+    });
+  }
+
+  demoteUser(userId: string){
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/demote-user',
+      body: userId
+    });
+  }
 }
