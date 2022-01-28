@@ -71,7 +71,7 @@ public class PlanningController {
 
     @MessageMapping("/planning/{planningUuid}/reveal")
     public void reveal(@DestinationVariable UUID planningUuid) {
-        planningService.reveal(planningUuid);
+        planningService.reveal(planningUuid, true);
     }
 
     @MessageMapping("/planning/{planningUuid}/promote-user")
@@ -82,6 +82,11 @@ public class PlanningController {
     @MessageMapping("/planning/{planningUuid}/demote-user")
     public void demoteUser(@DestinationVariable UUID planningUuid, String userIdToDemote) {
         planningService.demoteUser(planningUuid, userIdToDemote);
+    }
+
+    @MessageMapping("/planning/{planningUuid}/{userId}/set-spectator")
+    public void setSpectator(@DestinationVariable UUID planningUuid, @DestinationVariable String userId, boolean isSpectator) {
+        planningService.setSpectator(planningUuid, userId, isSpectator);
     }
 
 

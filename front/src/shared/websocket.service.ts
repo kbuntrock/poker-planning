@@ -15,7 +15,8 @@ export interface User {
   displayName: string,
   voted: boolean,
   vote: number,
-  connected: boolean
+  connected: boolean,
+  spectator: boolean
 }
 
 export interface WSMessage {
@@ -158,6 +159,13 @@ export class WebsocketService {
     this.client.publish({
       destination: '/app/planning/'+this.roomId+'/demote-user',
       body: userId
+    });
+  }
+
+  setSpectator(userId: string, isSpectator: boolean){
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/'+userId+'/set-spectator',
+      body: '' + isSpectator
     });
   }
 }

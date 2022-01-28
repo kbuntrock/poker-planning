@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -21,11 +19,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class PlanningService {
 
-    private static Logger LOG = LoggerFactory.getLogger(PlanningService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(PlanningService.class);
 
     public static final String CLEAN_JOB_FREQUENCY_EL = "#{${planner.planning.clean-frequency-second}*1000}";
 
@@ -124,10 +123,31 @@ public class PlanningService {
             throw new IllegalStateException("Invalid vote value");
         }
 
+        if(securityService.getUser().isSpectator()){
+            LOGGER.warn("Utilisateur {} ne peut pas voter, c'est un spectateur", securityService.getUser().getDisplayName());
+            return;
+        }
+
+
         session.getState().getVotes().put(securityService.getUser().getName(), value);
         session.updateActivity();
 
-        sendToPlanning(session, MessageType.VOTE);
+        // On regarde si tout le monde (non spectateur) a voté
+        boolean allVoted = true;
+        for(User user : session.getUsers().values().stream().filter(u -> !u.isSpectator()).collect(Collectors.toList())){
+            if(!session.getState().getVotes().containsKey(user.getName())){
+                allVoted = false;
+                break;
+            }
+        }
+
+        // Si oui, on révèle les votes
+        if(allVoted){
+            reveal(planningUuid, false);
+        } else {
+            // Si non, on envoi l'indication que tel utilisateur a voté.
+            sendToPlanning(session, MessageType.VOTE);
+        }
     }
 
     public void newStory(UUID planningUuid, String label) {
@@ -151,10 +171,12 @@ public class PlanningService {
     }
 
 
-    public void reveal(UUID planningUuid) {
-        securityService.checkNotAnonymous()
-                .checkBelongToPlanning(planningUuid)
-                .checkIfAdmin();
+    public void reveal(UUID planningUuid, boolean mustBeAdmin) {
+        securityService.checkNotAnonymous().checkBelongToPlanning(planningUuid);
+
+        if(mustBeAdmin){
+            securityService.checkIfAdmin();
+        }
 
         PlanningSession session = getSession(planningUuid);
         State sessionState = session.getState();
@@ -179,6 +201,7 @@ public class PlanningService {
                 .checkIfAdmin();
 
         PlanningSession session = getSession(planningUuid);
+        session.updateActivity();
 
         if(session.getUsers().containsKey(userIdToPromote)){
             session.getAdminList().add(userIdToPromote);
@@ -193,6 +216,7 @@ public class PlanningService {
                 .checkIfAdmin();
 
         PlanningSession session = getSession(planningUuid);
+        session.updateActivity();
 
         // On ne peut ni s'enlever soit-même la permission d'admin, ni enlever le dernier administrateur
         if(session.getAdminList().size() > 1 && session.getAdminList().contains(userIdToDemote) && !securityService.getUser().getName().equals(userIdToDemote)){
@@ -200,6 +224,21 @@ public class PlanningService {
             sendToPlanning(session, MessageType.STATE);
         }
 
+    }
+
+    public void setSpectator(final UUID planningUuid, final String userId, final boolean isSpectator) {
+        securityService.checkNotAnonymous()
+                .checkBelongToPlanning(planningUuid)
+                .checkIfAdmin();
+
+        PlanningSession session = getSession(planningUuid);
+        session.updateActivity();
+
+        User user = session.getUsers().get(userId);
+        if(user.isSpectator() != isSpectator){
+            user.setSpectator(isSpectator);
+            sendToPlanning(session, MessageType.STATE);
+        }
     }
 
     private void sendToPlanning(PlanningSession session, MessageType type) {
@@ -246,14 +285,14 @@ public class PlanningService {
 
     @Scheduled(fixedDelayString = CLEAN_JOB_FREQUENCY_EL, initialDelayString = CLEAN_JOB_FREQUENCY_EL)
     public void cleanOldPlannings() {
-        LOG.info("Clean old plannings job");
+        LOGGER.info("Clean old plannings job");
 
         Instant timeLimit = Instant.now().minus(planningMaxAgeHour, ChronoUnit.HOURS);
 
         int prevSize = sessions.size();
         sessions.entrySet().removeIf(e -> e.getValue().getLastActivity().isBefore(timeLimit));
 
-        LOG.info("  " + sessions.size() + " plannings remaining (" + (prevSize - sessions.size()) + " deleted)");
+        LOGGER.info("  " + sessions.size() + " plannings remaining (" + (prevSize - sessions.size()) + " deleted)");
     }
 
 }

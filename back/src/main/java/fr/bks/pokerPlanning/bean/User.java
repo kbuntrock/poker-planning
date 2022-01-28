@@ -22,6 +22,11 @@ public class User {
     @JsonIgnore
     private List<String> wsIdList = new ArrayList<>();
 
+    /**
+     * Un spectateur ne peut pas voter (vérification faîte uniquement au moment de l'action de voter)
+     */
+    private boolean spectator = false;
+
     public User(final WebSocketPrincipal principal, final PlanningSession session) {
         this.name = principal.getName();
         this.displayName = principal.getDisplayName();
@@ -65,5 +70,13 @@ public class User {
 
     public String getSecretKey() {
         return secretKey;
+    }
+
+    public boolean isSpectator() {
+        return spectator;
+    }
+
+    public void setSpectator(boolean spectator) {
+        this.spectator = spectator;
     }
 }

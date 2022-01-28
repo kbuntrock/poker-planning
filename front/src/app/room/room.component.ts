@@ -26,6 +26,8 @@ enum ColorScheme {
 export class RoomComponent implements OnInit, OnDestroy {
 
   myUserName: string;
+  // true si l'utilisateur est spectateur dans la session
+  isSpectator: boolean;
 
   // Indique si on a reçu les informations de la room en cours
   fullMessageReceived: boolean = false;
@@ -224,6 +226,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     users.forEach(x => {
       x.voted = false;
       this.usersMap.set(x.name, x);
+      if(x.name === this.myUserName){
+        this.isSpectator = x.spectator;
+      }
     });
     return users;
   }
@@ -259,6 +264,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   demoteUser(userId: string){
     this.wsService.demoteUser(userId);
+  }
+
+  setSpectator(userId: string, isSpectator: boolean){
+    this.wsService.setSpectator(userId, isSpectator);
   }
 
 }

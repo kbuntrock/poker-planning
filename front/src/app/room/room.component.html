@@ -3,16 +3,18 @@
     <mat-list>
         <mat-list-item [ngClass]="(!user.connected)?'user-disconnected':'user'" *ngFor="let user of users">
             
-            <button [ngClass]="!isScrumMaster || myUserName === user.name?'hidden':''" [matMenuTriggerFor]="menuAdmin" class="user-menu-icon" mat-icon-button>
+            <button [ngClass]="!isScrumMaster ?'hidden':''" [matMenuTriggerFor]="menuAdmin" class="user-menu-icon" mat-icon-button>
                 <mat-icon >more_horiz</mat-icon>
             </button>
             <mat-menu #menuAdmin="matMenu">
                 <button *ngIf="!adminList.includes(user.name)" mat-menu-item (click)="promoteUser(user.name)">Promouvoir administrateur</button>
-                <button *ngIf="adminList.includes(user.name)" mat-menu-item (click)="demoteUser(user.name)">Rétrograder utilisateur</button>
+                <button *ngIf="adminList.includes(user.name) && myUserName !== user.name" mat-menu-item (click)="demoteUser(user.name)">Rétrograder utilisateur</button>
+                <button *ngIf="user.spectator" mat-menu-item (click)="setSpectator(user.name, false)">Passer votant</button>
+                <button *ngIf="!user.spectator" mat-menu-item (click)="setSpectator(user.name, true)">Passer spectateur</button>
             </mat-menu>
 
-            <mat-icon *ngIf="!adminList.includes(user.name)" class="user-icon">account_circle</mat-icon>
-            <mat-icon *ngIf="adminList.includes(user.name)" class="user-icon">assignment_ind</mat-icon>
+            <mat-icon [ngClass]="adminList.includes(user.name)?'admin-color':''" *ngIf="!user.spectator" class="user-icon">account_circle</mat-icon>
+            <mat-icon [ngClass]="adminList.includes(user.name)?'admin-color':''" *ngIf="user.spectator" class="user-icon">preview</mat-icon>
             {{ user.displayName }}
             <mat-icon *ngIf="user.voted" class="voted-icon">how_to_vote</mat-icon>
         </mat-list-item>
@@ -60,7 +62,14 @@
             <div *ngIf="isScrumMaster" class="direct-link"><button *ngIf="voteInProgress" (click)="revelerVotes()" mat-raised-button color="accent">Révéler les votes</button></div>
             <app-story-creator *ngIf="isScrumMaster" [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
         </div>
-        <app-vote-input *ngIf="voteInProgress" class="card-panel" [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" (voteEvent)="voter($event)"></app-vote-input>
+        <ng-container *ngIf="voteInProgress">
+            <app-vote-input *ngIf="!isSpectator" class="card-panel" [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" (voteEvent)="voter($event)"></app-vote-input>
+            <div *ngIf="isSpectator" class="panel-attente-us">
+                <h2 class="fas-centered">Les votes sont en cours</h2>
+                <mat-spinner class="fas-centered"></mat-spinner>
+            </div>
+        </ng-container>
+        
         <app-results-board *ngIf="votesMap.size !== 0" class="results" [votesMap]="votesMap" [voteValues]="voteValues"></app-results-board>
     </ng-container>
 </div>
