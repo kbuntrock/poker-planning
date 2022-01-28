@@ -69,7 +69,8 @@ export class WebsocketService {
   connect() {
     this.client.connectHeaders = {
       'userId': this.appProperties.getUserId(),
-      'username': this.appProperties.getUsername()
+      'username': this.appProperties.getUsername(),
+      'userKey': this.appProperties.getUserKey()
     };
 
     console.info("Connexion ...")
@@ -116,12 +117,11 @@ export class WebsocketService {
     this.subscriptions.push(
       this.client.subscribe('/user/topic/planning/'+roomId, callback)
     );
-    // et on s'enregistre dessus en tant qu'utilisateur
-    console.info(JSON.stringify({'displayName': this.appProperties.getUsername(), 'name':this.appProperties.getUserId()}));
-    this.client.publish({
-      destination: '/app/planning/'+roomId+'/register',
-      body: JSON.stringify({'displayName': this.appProperties.getUsername(), 'name':this.appProperties.getUserId()})
-    });
+    // Cette dernière souscription permet d'initialiser les données mais elle ne sera pas sauvegardée côté back
+    // https://docs.spring.io/spring-framework/docs/5.3.9/reference/html/web.html#websocket-stomp-subscribe-mapping
+    this.subscriptions.push(
+      this.client.subscribe('/app/planning/'+roomId, callback)
+    );
   }
 
   public startNewStory(storyName: string){

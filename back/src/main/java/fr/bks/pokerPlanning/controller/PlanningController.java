@@ -1,16 +1,18 @@
 package fr.bks.pokerPlanning.controller;
 
+import fr.bks.pokerPlanning.bean.PlanningOutputMessage;
 import fr.bks.pokerPlanning.bean.PlanningSession;
 import fr.bks.pokerPlanning.bean.PlanningVoteMessage;
 import fr.bks.pokerPlanning.service.PlanningService;
 import fr.bks.pokerPlanning.service.SecurityService;
-import fr.bks.pokerPlanning.websocket.WebSocketPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -19,6 +21,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/")
 public class PlanningController {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(PlanningController.class);
 
     @Autowired
     private PlanningService planningService;
@@ -34,6 +38,7 @@ public class PlanningController {
     @MessageExceptionHandler
     @SendToUser("/topic/error")
     public String handleException(Exception ex) {
+        LOGGER.error("websocket error", ex);
         return ex.getMessage();
     }
 
@@ -44,12 +49,15 @@ public class PlanningController {
         return planningService.createSession(userId, roomName);
     }
 
-    @MessageMapping("/planning/{planningUuid}/register")
-    public void register(@DestinationVariable UUID planningUuid) {
-        planningService.register(planningUuid);
+    /**
+     * Le retour d'un subscribe est par défaut transféré directement à la personne ayant souscrit.
+     * @param planningUuid
+     * @return full planning state
+     */
+    @SubscribeMapping("/planning/{planningUuid}")
+    public PlanningOutputMessage register(@DestinationVariable UUID planningUuid) {
+        return planningService.register(planningUuid);
     }
-
-    // todo changer de nom, on repasse par register ou méthode dédiée ?
 
     @MessageMapping("/planning/{planningUuid}/vote")
     public void vote(@DestinationVariable UUID planningUuid, PlanningVoteMessage inputMessage) {

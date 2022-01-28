@@ -20,7 +20,6 @@ import org.springframework.web.socket.messaging.WebSocketAnnotationMethodMessage
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -31,9 +30,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public static String USER_TOPIC_ERROR_PREFIX = "/user/topic/error";
     public static String APP_DESTINATION_PREFIX = "/app";
 
-    private static final String USER_ID_COOKIE_NAME = "userId";
-    private static final String USERKEY_COOKIE_NAME = "userKey";
-    private static final String USERNAME_COOKIE_NAME = "username";
+    private static final String USER_ID_HEADER_NAME = "userId";
+    private static final String USERKEY_HEADER_NAME = "userKey";
+    private static final String USERNAME_HEADER_NAME = "username";
 
     @Autowired
     private PlanningService planningService;
@@ -46,6 +45,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes(APP_DESTINATION_PREFIX);
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -72,9 +72,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 if(accessor != null && accessor.getCommand() != null) {
                     StompCommand command = accessor.getCommand();
                     if(StompCommand.CONNECT == command) {
-                        String userId = accessor.getFirstNativeHeader(USER_ID_COOKIE_NAME);
-                        String userKey = accessor.getFirstNativeHeader(USERKEY_COOKIE_NAME);
-                        String encodedUserName = accessor.getFirstNativeHeader(USERNAME_COOKIE_NAME);
+                        String userId = accessor.getFirstNativeHeader(USER_ID_HEADER_NAME);
+                        String userKey = accessor.getFirstNativeHeader(USERKEY_HEADER_NAME);
+                        String encodedUserName = accessor.getFirstNativeHeader(USERNAME_HEADER_NAME);
                         String userName = URLDecoder.decode(encodedUserName, StandardCharsets.UTF_8);
 
                         WebSocketPrincipal principal = new WebSocketPrincipal(userId, userName, userKey, accessor.getSessionId());
@@ -93,7 +93,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
                 if (handler instanceof WebSocketAnnotationMethodMessageHandler) {
                     StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                    if(accessor.getCommand() != null && StompCommand.SEND == accessor.getCommand()) {
+                    if(accessor.getCommand() != null) {
                         securityService.registerPrincipal((WebSocketPrincipal) ((WebsocketAuthent) accessor.getUser()).getPrincipal());
                     }
                 }

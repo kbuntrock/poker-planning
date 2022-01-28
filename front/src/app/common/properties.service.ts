@@ -49,6 +49,10 @@ export class PropertiesService {
     return this.userId;
   }
 
+  public getUserKey(): string {
+    return this.userKey;
+  }
+
   public disconnect(): void {
     this.userId = undefined;
     this.userKey = undefined;

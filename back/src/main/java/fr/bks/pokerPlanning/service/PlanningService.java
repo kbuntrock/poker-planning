@@ -67,7 +67,7 @@ public class PlanningService {
     }
 
 
-    public void register(UUID planningUuid) {
+    public PlanningOutputMessage register(UUID planningUuid) {
 
         WebSocketPrincipal principal = securityService.getPrincipal();
 
@@ -92,9 +92,11 @@ public class PlanningService {
             sendToPlanning(session, MessageType.STATE);
         }
 
-        sendToWsSession(user.getName(), wsId, session, MessageType.FULL);
-
         session.updateActivity();
+
+        PlanningOutputMessage output = getPlanningOutputMessage(session, MessageType.FULL);
+        output.setMyVote(session.getState().getVotes().get(securityService.getUser().getName()));
+        return output;
     }
 
     public void disconnectUser() {
