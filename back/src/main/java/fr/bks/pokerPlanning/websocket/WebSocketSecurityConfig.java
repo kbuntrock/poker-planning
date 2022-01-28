@@ -16,6 +16,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     protected void configureInbound(final MessageSecurityMetadataSourceRegistry securityConfiguration) {
         // Les subscribes à des routes dédiées sont permises
         securityConfiguration.simpSubscribeDestMatchers(WebSocketConfig.TOPIC_PLANNING_PREFIX).authenticated();
+        securityConfiguration.simpSubscribeDestMatchers("/app/planning/*").authenticated();
         securityConfiguration.simpSubscribeDestMatchers(WebSocketConfig.USER_TOPIC_PLANNING_PREFIX).authenticated();
         securityConfiguration.simpSubscribeDestMatchers(WebSocketConfig.USER_TOPIC_ERROR_PREFIX).authenticated();
 		// Les autres subscribes ne sont pas autorisés
