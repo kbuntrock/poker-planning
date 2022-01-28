@@ -28,7 +28,7 @@ export class PropertiesService {
 
   private roomInfos$ = new BehaviorSubject<RoomInfo>(undefined);
 
-  constructor(private cookieService: CookieService) {
+  constructor(private cookieService: CookieService,) {
     if (this.cookieService.check(PropertiesService.USER_ID_COOKIE_NAME)) {
       this.userId = this.cookieService.get(PropertiesService.USER_ID_COOKIE_NAME);
     }
@@ -60,6 +60,7 @@ export class PropertiesService {
     this.cookieService.delete(PropertiesService.USER_ID_COOKIE_NAME, '/');
     this.cookieService.delete(PropertiesService.USERKEY_COOKIE_NAME, '/');
     this.cookieService.delete(PropertiesService.USERNAME_COOKIE_NAME, '/');
+    this.roomInfos$.next(undefined);
   }
 
   public getUsername$(): Observable<string> {
