@@ -158,10 +158,6 @@ public class PlanningService {
         PlanningSession session = getSession(planningUuid);
         State sessionState = session.getState();
 
-        if (sessionState.isVoteInProgress()) {
-            throw new IllegalStateException("Vote is already in progress");
-        }
-
         sessionState.setVoteInProgress(true);
 
         sessionState.getVotes().clear();

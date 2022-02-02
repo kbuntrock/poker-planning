@@ -105,7 +105,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public void afterMessageHandled(Message<?> message, MessageChannel channel, MessageHandler handler, Exception ex) {
                 if (handler instanceof WebSocketAnnotationMethodMessageHandler) {
                     StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                    if(accessor.getCommand() != null && StompCommand.SEND == accessor.getCommand()) {
+                    if(accessor.getCommand() != null) {
                             securityService.unRegisterPrincipal((WebSocketPrincipal) ((WebsocketAuthent) accessor.getUser()).getPrincipal());
                     }
                 }

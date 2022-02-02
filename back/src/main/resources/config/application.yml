@@ -15,3 +15,7 @@ spring:
       matching-strategy: ant_path_matcher
       # pas de path_pattern_parser car paraît difficile de configurer l'AngularController pour matcher
       # avec /app/join-room/xxx par exemple mais pas avec les ressources /app/**/*.*
+
+# peut etre surchargé en arguments, ex: --logging.config=/path/to/log4j2.xml
+logging:
+  config: classpath:log4j2-spring-default.xml
