@@ -171,6 +171,12 @@ export class WebsocketService {
     this.client.publish({
       destination: '/app/planning/'+this.roomId+'/reveal'
     });
+  }
+
+  public revoter() {
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/revote'
+    });
 
   }
 

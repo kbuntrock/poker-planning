@@ -59,7 +59,10 @@
         <!-- Lorsque la première US a été choisie -->
         <div *ngIf="storyLabel !== undefined" class="control-panel">
             <h1 class="story-title">Story : {{ storyLabel }}</h1>
-            <div *ngIf="isScrumMaster" class="direct-link"><button *ngIf="voteInProgress" (click)="revelerVotes()" mat-raised-button color="accent">Révéler les votes</button></div>
+            <div *ngIf="isScrumMaster" class="direct-link">
+                <button *ngIf="voteInProgress" (click)="revelerVotes()" mat-raised-button color="accent">Révéler les votes</button>
+                <button *ngIf="!voteInProgress" (click)="revoter()" mat-raised-button color="accent">Relancer un vote</button>
+            </div>
             <app-story-creator *ngIf="isScrumMaster" [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
         </div>
         <ng-container *ngIf="voteInProgress">
