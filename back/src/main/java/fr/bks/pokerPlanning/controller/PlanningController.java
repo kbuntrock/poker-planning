@@ -74,6 +74,11 @@ public class PlanningController {
         planningService.reveal(planningUuid, true);
     }
 
+    @MessageMapping("/planning/{planningUuid}/revote")
+    public void revote(@DestinationVariable UUID planningUuid) {
+        planningService.revote(planningUuid);
+    }
+
     @MessageMapping("/planning/{planningUuid}/promote-user")
     public void promoteUser(@DestinationVariable UUID planningUuid, String userIdToPromote) {
         planningService.promoteUser(planningUuid, userIdToPromote);

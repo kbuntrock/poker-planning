@@ -49,10 +49,16 @@ export class WebsocketService {
 
     // Important : Il faut passer une fonction capable de renvoyer une nouvelle instance du websocket sous peine de ne pas avoir la reconnection automatique
     // (et de ne pas pouvoir alterner les activate/deactivate)
-    this.client = Stomp.over(() => new SockJS(url, null, {transports:['websocket','eventsource','xhr-polling']}));
+    this.client = Stomp.over(() => new SockJS(url, null, 
+      {
+        transports:['websocket','eventsource','xhr-polling'],
+        sessionId: 15
+      }));
 
     this.client.onConnect = this.onConnect;
     this.client.onDisconnect = this.onDisconnect;
+    this.client.onWebSocketClose = this.onWebSocketClose;
+    this.client.onStompError = this.onStompError;
 
     this.client.reconnectDelay = 5000;
     this.client.heartbeatIncoming = 20000;
@@ -103,11 +109,31 @@ export class WebsocketService {
   }
 
   private onDisconnect = (receipt: IFrame) => {
+    console.info('onDisconnect called')
+    this.disconnectedHandler();
+  }
+
+  private readonly onWebSocketClose = (event: any) => {
+    console.info('onWebsocketClose called')
+    this.disconnectedHandler();
+  };
+
+  private disconnectedHandler() {
     this.state.next(SocketClientState.DISCONNECTED);
     this.subscriptions.forEach(s => {
       s.unsubscribe();
     });
   }
+
+  /**
+   * Si la déconnexion est innopinée, ce n'est pas la callback "onDisconnect" qui est appelée directement.
+   * Mais on l'appelle en chaîne ici.
+   * @param receipt 
+   */
+  private onStompError = (receipt: IFrame) => {
+    console.info('StompError happened')
+  }
+
 
   public joinRoom(roomId: string, callback: messageCallbackType){
     this.roomId = roomId;
@@ -144,6 +170,12 @@ export class WebsocketService {
   public revelerVotes() {
     this.client.publish({
       destination: '/app/planning/'+this.roomId+'/reveal'
+    });
+  }
+
+  public revoter() {
+    this.client.publish({
+      destination: '/app/planning/'+this.roomId+'/revote'
     });
 
   }

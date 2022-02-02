@@ -258,6 +258,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
   }
 
+  revoter() {
+    this.wsService.revoter();
+  }
+
   promoteUser(userId: string){
     this.wsService.promoteUser(userId);
   }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+    <Properties>
+        <Property name="FILE_LOG_PATTERN"
+                  value="%date{yyyyMMdd HH:mm:ss.SSS} %-5level [%thread] %-30.30logger{1.} - %msg%n"/>
+        <!-- peut être surchargé en options, ex: -DLOG_DIR=/tmp/log/poker -->
+        <Property name="LOG_DIR_RESOLVED" value="${sys:LOG_DIR:-${env:LOG_DIR:-/var/log/poker}}"/>
+    </Properties>
+    <Appenders>
+        <RollingFile name="RollingFile" fileName="${LOG_DIR_RESOLVED}/poker.log"
+                     filePattern="${LOG_DIR_RESOLVED}/archived/poker-%d{yyyy-MM-dd}.%i.log">
+            <PatternLayout pattern="${sys:FILE_LOG_PATTERN}"/>
+            <Policies>
+                <!-- rollover daily and when the file reaches 10 MegaBytes -->
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOG_DIR_RESOLVED}/archived/">
+                    <IfLastModified age="${sys:LOG_ARCHIVE_DAYS:-${env:LOG_ARCHIVE_DAYS:-7}}d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.springframework.boot.SpringApplication" level="info" additivity="false">
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+
+        <Logger name="fr.bks.pokerPlanning.PokerPlanningApplication" level="info"
+                additivity="false"> <!-- affiche quand l'app est lancée -->
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+
+        <Logger name="fr.bks.pokerPlanning.service.PlanningService" level="info" additivity="false">
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+
+        <!-- peut être surchargé en options, ex: -Dlogging.level.root=info ou -DLOG_LEVEL=info -->
+        <Root level="${sys:LOG_LEVEL:-${env:LOG_LEVEL:-warn}}">
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
