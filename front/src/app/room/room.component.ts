@@ -2,13 +2,15 @@ import { Component, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { PlatformLocation } from '@angular/common'
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SocketClientState, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
+import { SocketClientState, Story, User, WebsocketService, WSMessage } from '../../shared/websocket.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { PropertiesService } from '../common/properties.service';
 import { environment } from '../../environments/environment';
 import { VoteValue } from '../model/vote-value';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HistoryCardComponent } from './history-card/history-card.component';
+import { MatDialog } from '@angular/material/dialog';
 
 enum ColorScheme {
   Green = "Green",
@@ -51,6 +53,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   votesMap = new Map<number, Array<User>>();
   votesArray: Array<string> = undefined;
 
+  historique: Array<Story>;
+
   subscription: Subscription = new Subscription();
 
   public usForm: FormGroup;
@@ -59,8 +63,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     private readonly appProperties: PropertiesService,
     private readonly ngZone: NgZone,
     private readonly platformLocation: PlatformLocation,
-    private snackBar: MatSnackBar,
-    private readonly formBuilder: FormBuilder)  {
+    private readonly snackBar: MatSnackBar,
+    private readonly formBuilder: FormBuilder,
+    private readonly dialog: MatDialog)  {
 
       this.usForm = this.formBuilder.group({
         usName: ['', [Validators.required, Validators.maxLength(35)]]
@@ -131,6 +136,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       name: response.roomName,
       url: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'room/' + this.roomId
     });
+    
     this.computeVoteValuesColors();
     this.parseState(response);
   }
@@ -169,6 +175,12 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
     this.parseVoted(response.voted);
     this.parseVotes(response.votes);
+
+    if(response.stories && response.stories.length > 0) {
+      this.historique = response.stories;
+    } else {
+      this.historique = undefined;
+    }
   }
 
   parseVoted(voted: Array<string>) {
@@ -193,19 +205,18 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   }
 
-  parseVotes(votes: any) {
+  parseVotes(votes: Map<string, number>) {
     this.votesMap.clear();
     this.votesArray = undefined;
+    // On reset les votes actuels
     for (const element of this.usersMap.values()) {
       element.vote = undefined;
     }
     this.voteInProgress = !votes;
-
     if(votes) {
-      const keys: string[] = Object.keys(votes);
-      keys.forEach(k => {
-        const user = this.usersMap.get(k);
-        user.vote = +votes[k];
+      for (const [userId, vote] of Object.entries(votes)) {
+        const user = this.usersMap.get(userId);
+        user.vote = vote;
         if(this.votesMap.has(user.vote)){
           this.votesMap.get(user.vote).push(user);
         } else {
@@ -213,7 +224,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           userArray.push(user);
           this.votesMap.set(user.vote, userArray);
         }
-      });
+      }
       this.votesArray = new Array<string>();
       for (const entry of this.votesMap.entries()) {
         this.votesArray.push(entry[0] + ' : ' + entry[1].map(x => x.displayName).join(', '));
@@ -272,6 +283,39 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   setSpectator(userId: string, isSpectator: boolean){
     this.wsService.setSpectator(userId, isSpectator);
+  }
+
+  seePastStory(index: number){
+
+
+    const votesMap = new Map<number, Array<User>>();
+    for (const [userId, vote] of Object.entries(this.historique[index].votes)) {
+      const originalUser = this.usersMap.get(userId);
+      const user : User = {
+        displayName: originalUser.displayName,
+        name: originalUser.name,
+        vote: originalUser.vote,
+        voted: undefined, // Copie pour l'affichage de l'historique, information non importante
+        connected: undefined,
+        spectator: undefined
+      };
+      if(votesMap.has(vote)){
+        votesMap.get(vote).push(user);
+      } else {
+        const userArray = new Array<User>();
+        userArray.push(user);
+        votesMap.set(vote, userArray);
+      }
+    }
+
+    this.dialog.open(HistoryCardComponent, {
+      data: { 
+        name: this.historique[index].name,
+        votesMap: votesMap, // Conversion objet en map
+        voteValues: this.voteValues,
+        choosenValue: this.historique[index].chosenValue
+      },
+    });
   }
 
 }

@@ -158,6 +158,14 @@ public class PlanningService {
         PlanningSession session = getSession(planningUuid);
         State sessionState = session.getState();
 
+        if(sessionState.getStoryLabel() != null && !sessionState.getVotes().isEmpty() && !sessionState.isVoteInProgress()) {
+            // Après le reveal on peux laisser l'admin faire le choix de la valeur retenue ou lancer un revote,
+            // ensuite ne fois validé, on le met dans la liste archivée
+            // On n'archive pas les stories en cours de vote.
+            Story story = new Story(sessionState.getStoryLabel(), sessionState.getVotes());
+            session.getStories().add(story);
+        }
+
         sessionState.setVoteInProgress(true);
 
         sessionState.getVotes().clear();
@@ -198,11 +206,6 @@ public class PlanningService {
         if (!sessionState.isVoteInProgress()) {
             throw new IllegalStateException("No vote is in progress");
         }
-
-
-        // TODO : après le reveal on peux laisser l'admin faire le choix de la valeur retenue ou lancer un revote, ensuite ne fois validé c'est la ou on le met dans la lsite archivée
-        Story story = new Story(sessionState.getStoryLabel(), sessionState.getVotes());
-        session.getStories().add(story);
 
         sessionState.setVoteInProgress(false);
 
@@ -278,12 +281,12 @@ public class PlanningService {
         output.setType(type.name());
 
         if (MessageType.FULL.equals(type)) {
-            output.setStories(session.getStories());
             output.setVoteValues(session.getVoteValues());
             output.setRoomName(session.getName());
         }
 
         if (MessageType.FULL.equals(type) || MessageType.STATE.equals(type)) {
+            output.setStories(session.getStories());
             output.setAdminList(session.getAdminList());
             output.setConnectedUsers(new ArrayList<>(session.getUsers().values()));
             output.setStoryLabel(session.getState().getStoryLabel());

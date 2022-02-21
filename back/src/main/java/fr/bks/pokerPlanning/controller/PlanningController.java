@@ -94,5 +94,4 @@ public class PlanningController {
         planningService.setSpectator(planningUuid, userId, isSpectator);
     }
 
-
 }

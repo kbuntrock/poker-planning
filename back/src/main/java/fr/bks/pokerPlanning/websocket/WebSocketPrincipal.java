@@ -41,7 +41,11 @@ public class WebSocketPrincipal implements Principal {
     }
 
     public static WebSocketPrincipal getFromHeader(StompHeaderAccessor accessor){
-        return (WebSocketPrincipal) ((WebsocketAuthent) accessor.getUser()).getPrincipal();
+        var usr = accessor.getUser();
+        if(usr != null && usr instanceof WebsocketAuthent){
+            return (WebSocketPrincipal) ((WebsocketAuthent) usr).getPrincipal();
+        }
+        return null;
     }
 
 }

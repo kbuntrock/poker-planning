@@ -30,6 +30,8 @@ import { ResultsBoardComponent } from './room/results/results-board/results-boar
 import { MatSnackBarModule } from '@angular/material/snack-bar'; 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HistoryCardComponent } from './room/history-card/history-card.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     CardComponent,
     ResultsChartComponent,
     ResultsBoardComponent,
+    HistoryCardComponent,
   ],
   imports: [
     ChartsModule,
@@ -64,7 +67,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatListModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

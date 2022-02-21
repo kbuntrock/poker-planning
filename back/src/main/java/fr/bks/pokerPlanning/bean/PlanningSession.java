@@ -17,7 +17,9 @@ public class PlanningSession {
     private final Map<String, User> connectedUsers = new ConcurrentHashMap<>();
     private Set<String> adminList = ConcurrentHashMap.newKeySet();
 
+    // L'US en cours de vote
     private final State state = new State();
+    // Les US déjà votées (historique)
     private final List<Story> stories = new ArrayList<>();
     private final List<Integer> voteValues = List.of(1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
 

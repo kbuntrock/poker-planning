@@ -64,6 +64,14 @@
                 <button *ngIf="!voteInProgress" (click)="revoter()" mat-raised-button color="accent">Relancer un vote</button>
             </div>
             <app-story-creator *ngIf="isScrumMaster" [libelleUS]="storyLabel" (newLibelleUS)="changerUS($event)" class="story-card"></app-story-creator>
+            <ng-container *ngIf="historique" >
+                <button class="history-button" mat-icon-button [matMenuTriggerFor]="menuhistory">
+                    <mat-icon>history</mat-icon>
+                </button>
+                <mat-menu #menuhistory="matMenu">
+                    <button *ngFor="let story of historique; let index = index;" mat-menu-item (click)="seePastStory(index)">{{ story.name }}</button>
+                </mat-menu>
+            </ng-container>
         </div>
         <ng-container *ngIf="voteInProgress">
             <app-vote-input *ngIf="!isSpectator" class="card-panel" [inputMode]="'CARD'" [voteValues]="voteValues" [myVote]="myVote" (voteEvent)="voter($event)"></app-vote-input>

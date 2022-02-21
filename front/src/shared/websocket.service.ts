@@ -27,8 +27,17 @@ export interface WSMessage {
   storyLabel: string,
   voted: Array<string>,
   myVote: number,
-  votes: Array<string>,
-  roomName: string
+  votes: Map<string, number>,
+  roomName: string,
+  // L'historique
+  stories: Array<Story>
+}
+
+export interface Story {
+  name: string,
+  votes: Map<string, number>;
+  // Non utilisé pour l'instant
+  chosenValue: number;
 }
 
 @Injectable({
