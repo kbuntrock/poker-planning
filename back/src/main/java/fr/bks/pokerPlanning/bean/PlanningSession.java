@@ -21,7 +21,7 @@ public class PlanningSession {
     private final State state = new State();
     // Les US déjà votées (historique)
     private final List<Story> stories = new ArrayList<>();
-    private final List<Integer> voteValues = List.of(1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
+    private final List<Integer> voteValues = List.of(1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377);
 
     private Instant lastActivity = Instant.now(); // usefull for automatic cleaning
 
