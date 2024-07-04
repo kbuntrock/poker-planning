@@ -54,7 +54,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .addEndpoint("/api/websocket")
                 .setAllowedOrigins("http://localhost:4200") // Autorisation des CORS pour le devmode
                 .withSockJS()
-                //.setWebSocketEnabled(false)
+                .setWebSocketEnabled(true)
         ;
     }
 
